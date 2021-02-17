@@ -1,5 +1,5 @@
 import { Utils } from '../Utils';
-import { Player } from '6ec0bd7f/dist';
+import { Player } from 'tune-lavalink-client';
 import { GuildMember, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import GlobalCTX from '../GlobalCTX';
 import GuildSettings from "../../database/structures/GuildSettings";

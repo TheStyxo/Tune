@@ -1,4 +1,4 @@
-import { Player, Manager, Track, UnresolvedTrack } from '6ec0bd7f/dist';
+import { Player, Manager, Track, UnresolvedTrack } from 'tune-lavalink-client';
 import BaseEvent from '../../../utils/structures/BaseEvent';
 import GuildSettings from '../../../database/structures/GuildSettings';
 

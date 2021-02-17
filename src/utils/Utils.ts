@@ -8,7 +8,7 @@ import chalk, { Chalk } from 'chalk';
 import { BaseCommand, CommandCTX } from './structures/BaseCommand';
 import GlobalCTX from "./GlobalCTX";
 import InternalPermissions, { InternalPermissionResolvable } from "../database/utils/InternalPermissions";
-import { Player } from "6ec0bd7f/dist";
+import { Player } from "tune-lavalink-client";
 import GuildData from "../database/structures/Guild";
 import GuildSettings from "../database/structures/GuildSettings";
 import { Client } from "discord.js";

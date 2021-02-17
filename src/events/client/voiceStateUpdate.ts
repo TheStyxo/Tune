@@ -1,6 +1,6 @@
 import { Client, VoiceState } from 'discord.js';
 import BaseEvent from '../../utils/structures/BaseEvent';
-import { Player } from '6ec0bd7f/dist';
+import { Player } from 'tune-lavalink-client';
 
 export class VoiceStateUpdateEvent extends BaseEvent {
     constructor() {

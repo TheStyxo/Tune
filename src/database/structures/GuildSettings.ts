@@ -4,6 +4,7 @@ import createInstance from '../utils/createInstance';
 import merge from 'deepmerge';
 import { Collection } from 'discord.js';
 import GuildPermission from '../utils/GuildPermission';
+import { Filters } from 'tune-lavalink-client';
 
 export default class GuildSettings {
     // Class props //
@@ -127,6 +128,22 @@ export class GuildMusicSettings {
         await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.loop": value } }, { upsert: true });
         return this.GuildSettings._data.settings.music.loop = value;
     }
+}
+
+class FilterSettings {
+    // Class props //
+    GuildSettings: GuildSettings;
+    // Class props //
+
+    constructor(GuildSettings: GuildSettings) {
+        this.GuildSettings = GuildSettings;
+    }
+
+    get filters(): Filters {
+        return this.GuildSettings._data.settings.music.filters;
+    }
+
+    async setTimescale(): Promise<Filters | void> { }
 }
 
 class EQSettings {

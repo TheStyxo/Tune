@@ -1,5 +1,5 @@
 import { Collection } from 'discord.js';
-import { Player, Track } from '6ec0bd7f/dist';
+import { Player, Track } from 'tune-lavalink-client';
 import PlayingMessage from './PlayingMessage';
 
 export default class PlayingMessageManager extends Collection<string, PlayingMessage> {

@@ -2,7 +2,7 @@ import { Commands } from './Utils';
 import { Logger } from '../utils/Utils';
 import DB from '../database/DB';
 import { Client, Collection, GuildEmoji } from 'discord.js';
-import { Manager } from '6ec0bd7f/dist';
+import { Manager } from 'tune-lavalink-client';
 import credentials from '../../config/credentials.json';
 import PlayingMessageManager from './musicUtil/PlayingMessageManager';
 
