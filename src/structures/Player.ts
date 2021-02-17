@@ -503,7 +503,7 @@ export class Player {
 
     this.node.send({
       op: "filters",
-      guildId: this.guild,
+      guildId: this.guild.id,
       ...this.filters
     });
   }
@@ -525,7 +525,7 @@ export class Player {
 
     this.node.send({
       op: "filters",
-      guildId: this.guild,
+      guildId: this.guild.id,
       ...this.filters
     });
   }
@@ -545,7 +545,7 @@ export class Player {
 
     this.node.send({
       op: "filters",
-      guildId: this.guild,
+      guildId: this.guild.id,
       ...this.filters
     });
   }
@@ -555,7 +555,7 @@ export class Player {
     this.filters = filters;
     this.node.send({
       op: "filters",
-      guildId: this.guild,
+      guildId: this.guild.id,
       ...this.filters
     });
   }
