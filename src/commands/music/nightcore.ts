@@ -15,8 +15,6 @@ export default class NightcoreCommand extends BaseCommand {
     async run(ctx: CommandCTX) {
         if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
 
-        let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,
@@ -27,20 +25,26 @@ export default class NightcoreCommand extends BaseCommand {
         });
         if (res.isError) return;
 
-        if (!player) player = res.player;
+        if (res.player?.filters.timescale || ctx.guildSettings.music.filters.timescale) {
+            res.player?.setTimescale();
+            await ctx.guildSettings.music.setTimescale();
 
-        const volumeRequested = parseInt(ctx.args[0].replace(/%*/g, "").replace(/(re)(?:(s|se|set)?)/, "100"));
-        if (Number.isNaN(volumeRequested)) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 0 and ${ctx.guildSettings.music.volume.limit} to set the volume to!`, true));
+            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Disabled the nightcore mode.`);
+            await ctx.channel.send(embedified);
+            if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
+        }
+        else {
+            const timescale = {
+                speed: 1.0999999993162842,
+                pitch: 1.2999999523162842
+            };
 
-        if (volumeRequested > ctx.guildSettings.music.volume.limit) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The volume limit is enabled on this server, the volume cannot be set to a value above ${ctx.guildSettings.music.volume.limit}%`, true));
-        else if (volumeRequested > 1000) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between 0 and 1000 to set the volume to!", true));
+            res.player?.setTimescale(timescale);
+            if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setTimescale(timescale);
 
-        player?.setVolume(volumeRequested);
-
-        if (ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member).has("MANAGE_PLAYER")) await ctx.guildSettings.music.volume.setPercentage(volumeRequested);
-
-        const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the volume to ${volumeRequested}%.`);
-        await ctx.channel.send(embedified);
-        if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
+            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Enabled the nightcore mode.`);
+            await ctx.channel.send(embedified);
+            if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
+        }
     }
 }

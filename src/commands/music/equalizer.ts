@@ -16,8 +16,6 @@ export default class EqualizerCommand extends BaseCommand {
     async run(ctx: CommandCTX) {
         if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
 
-        let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,
@@ -29,8 +27,6 @@ export default class EqualizerCommand extends BaseCommand {
         });
         if (res.isError) return;
 
-        if (!player) player = res.player;
-
-        return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY, modifyDB: res.memberPerms.has("MANAGE_PLAYER") }).send();
+        return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player: res.player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY, modifyDB: res.memberPerms.has("MANAGE_PLAYER") }).send();
     }
 }

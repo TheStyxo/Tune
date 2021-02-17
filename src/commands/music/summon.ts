@@ -66,10 +66,11 @@ export default class SummonCommand extends BaseCommand {
                 break;
         }
 
-        player?.setEQ(...ctx.guildSettings.music.eq.bands.map((gain, band) => ({ band, gain })));
+        player.setFilters(ctx.guildSettings.music.filters);
+        player.setEQ(...ctx.guildSettings.music.eq.bands.map((gain, band) => ({ band, gain })));
 
         //connect to the channel
-        player?.connect();
+        player.connect();
 
         if (!opts) {
             const joinedEmbed = new this.utils.discord.MessageEmbed()

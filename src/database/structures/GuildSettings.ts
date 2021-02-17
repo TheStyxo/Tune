@@ -128,22 +128,77 @@ export class GuildMusicSettings {
         await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.loop": value } }, { upsert: true });
         return this.GuildSettings._data.settings.music.loop = value;
     }
-}
-
-class FilterSettings {
-    // Class props //
-    GuildSettings: GuildSettings;
-    // Class props //
-
-    constructor(GuildSettings: GuildSettings) {
-        this.GuildSettings = GuildSettings;
-    }
 
     get filters(): Filters {
         return this.GuildSettings._data.settings.music.filters;
     }
 
-    async setTimescale(): Promise<Filters | void> { }
+    /**
+    * Sets the timescale filter.
+    * @param {Filters["timescale"]} options Timescale options
+    */
+    async setTimescale({ speed, pitch, rate }: Filters["timescale"] = {}): Promise<this> {
+        if (!speed && !pitch && !rate) {
+            delete this.GuildSettings._data.settings.music.filters.timescale;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.timescale": null } }, { upsert: true });
+        }
+        else {
+            this.GuildSettings._data.settings.music.filters.timescale = {
+                "speed": speed || 1,
+                "pitch": pitch || 1,
+                "rate": rate || 1
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.timescale": this.GuildSettings._data.settings.music.filters.timescale } }, { upsert: true });
+        }
+        return this;
+    }
+
+    /**
+    * Sets the tremolo filter.
+    * @param {Filters["tremolo"]} options Tremolo options
+    */
+    async setTremolo({ frequency, depth }: Filters["tremolo"] = {}): Promise<this> {
+        if (!depth || !frequency) {
+            delete this.GuildSettings._data.settings.music.filters.tremolo;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.tremolo": null } }, { upsert: true });
+        }
+        else {
+            if (depth > 1 || depth < 0) throw new RangeError("The depth must be between 0 and 1");
+            if (frequency > 0) throw new RangeError("The frequency must be grater than 0");
+            this.GuildSettings._data.settings.music.filters.tremolo = {
+                "frequency": frequency,
+                "depth": depth
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.tremolo": this.GuildSettings._data.settings.music.filters.tremolo } }, { upsert: true });
+        }
+        return this;
+    }
+
+    /**
+    * Sets the rotation filter.
+    * @param {Filters["rotation"]} options Rotation options
+    */
+    async setRotation({ rotationHz }: Filters["rotation"] = {}): Promise<this> {
+        if (!rotationHz) {
+            delete this.GuildSettings._data.settings.music.filters.rotation;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.rotation": null } }, { upsert: true });
+        }
+        else {
+            if (rotationHz > 0) throw new RangeError("The rotationHz must be grater than 0");
+            this.GuildSettings._data.settings.music.filters.rotation = {
+                "rotationHz": rotationHz || 0
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.rotation": this.GuildSettings._data.settings.music.filters.rotation } }, { upsert: true });
+        }
+        return this;
+    }
+
+    /** Reset all audio filters except eq */
+    async setFilters(filters: Filters): Promise<this> {
+        this.GuildSettings._data.settings.music.filters = filters;
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters": this.GuildSettings._data.settings.music.filters } }, { upsert: true });
+        return this;
+    }
 }
 
 class EQSettings {
