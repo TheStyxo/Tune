@@ -36,12 +36,7 @@ export default class VolumeCommand extends BaseCommand {
             return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The loop is currently set to ${loop}!`, true));
         }
         else {
-            switch (ctx.args ? parseOptions(ctx.args[0]) : loop) {
-                default:
-                    loop = "QUEUE";
-                    res.player?.setQueueRepeat(true);
-                    if (res.memberPerms.has("MANAGE_PLAYER")) ctx.guildSettings.music.setLoop("QUEUE");
-                    break;
+            switch (ctx.args.length ? parseOptions(ctx.args[0]) : loop) {
                 case "QUEUE":
                     loop = "TRACK";
                     res.player?.setTrackRepeat(true);
@@ -52,6 +47,11 @@ export default class VolumeCommand extends BaseCommand {
                     res.player?.setTrackRepeat(false);
                     res.player?.setQueueRepeat(false);
                     if (res.memberPerms.has("MANAGE_PLAYER")) ctx.guildSettings.music.setLoop("DISABLED");
+                    break;
+                default:
+                    loop = "QUEUE";
+                    res.player?.setQueueRepeat(true);
+                    if (res.memberPerms.has("MANAGE_PLAYER")) ctx.guildSettings.music.setLoop("QUEUE");
                     break;
             }
 
