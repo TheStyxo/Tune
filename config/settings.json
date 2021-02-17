@@ -1,0 +1,23 @@
+{
+    "shardingManager": {
+        "totalShards": 1
+    },
+    "default_activity_status": {
+        "type": 2,
+        "text": "t!help",
+        "updateInterval": 10000
+    },
+    "default_invite_permissions": 536346111,
+    "default_command_cooldown": 10000,
+    "info": {
+        "websiteURL": "https://ririchiyobot.wixsite.com/ririchiyo",
+        "premiumURL": "https://discord.gg/XgwdeEv",
+        "supportServerURL": "https://discord.gg/XgwdeEv",
+        "version": "0.9.0",
+        "library": "ririchiyo.js#build",
+        "hosting": "@localhost/ririchiyo-dev-deps",
+        "externalSites": {
+            "top.gg": "https://top.gg/bot/696661803182194698"
+        }
+    }
+}

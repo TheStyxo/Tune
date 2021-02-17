@@ -1,0 +1,17 @@
+{
+    "apps": [
+        {
+            "name": "Tune",
+            "script": "src/main/shardingManager.js",
+            "error_file": "logs/err.log",
+            "out_file": "logs/out.log",
+            "log_file": "logs/logs.log",
+            "interpreter_args": [],
+            "watch": [],
+            "interpreter": "node",
+            "log_date_format": "DD-MM-YYYY hh:mma Z",
+            "exec_interpreter": "node",
+            "exec_mode": "fork"
+        }
+    ]
+}
