@@ -7,7 +7,7 @@ export default class PauseCommand extends BaseCommand {
         super({
             name: "pause",
             category: "music",
-            description: "Pauses the player."
+            description: "Pause the player."
         })
     }
 

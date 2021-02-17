@@ -1,0 +1,60 @@
+import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
+import { MusicUtil } from '../../utils/Utils';
+import InternalPermissions from '../../database/utils/InternalPermissions';
+const mainBassBand = 1;
+const bassBands = [1, 2]
+const effectivenessOnBand = [100, 60]
+
+export default class BassboostCommand extends BaseCommand {
+    constructor() {
+        super({
+            name: "bassboost",
+            aliases: ["bb", "bass"],
+            category: "music",
+            description: "Change the bassboost value."
+        })
+    }
+
+    async run(ctx: CommandCTX) {
+        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
+
+        let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
+
+        if (!ctx.args.length) {
+            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current bassboost is set to ${convertToPercent(player?.bands[mainBassBand] || ctx.guildSettings.music.eq.bands[mainBassBand])}%`));
+        }
+
+        const res = MusicUtil.canModifyPlayer({
+            guild: ctx.guild,
+            member: ctx.member,
+            textChannel: ctx.channel,
+            requiredPermissions: ["MANAGE_PLAYER"],
+            memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
+            noPlayerRequired: true
+        });
+        if (res.isError) return;
+
+        if (!player) player = res.player;
+
+        const bassboostString = ctx.args[0].replace(/%*/g, "");
+        const bassboostRequested = Number.isNaN(bassboostString) ? null : parseInt(bassboostString);
+        if (!bassboostRequested || bassboostRequested < -100 || bassboostRequested > 400) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between -100 and 400 to set the bassboost to!", true));
+        const bassboostGain = convertFromPercent(bassboostRequested);
+
+        const bandsArray = [];
+        for (const index in bassBands) {
+            bandsArray.push({ band: bassBands[index], gain: parseFloat(((effectivenessOnBand[index] / 100) * bassboostGain).toFixed(2)) });
+        }
+
+        player?.setEQ(...bandsArray);
+
+        if (ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member).has("MANAGE_PLAYER")) await ctx.guildSettings.music.eq.setBands(...bandsArray);
+
+        const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the bassboost to ${bassboostRequested}%.`);
+        await ctx.channel.send(embedified);
+        if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
+    }
+}
+
+const convertToPercent = (gain: number) => (gain * 100) / 0.25;
+const convertFromPercent = (percent: number) => (percent / 100) * 0.25;

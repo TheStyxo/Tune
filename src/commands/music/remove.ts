@@ -19,7 +19,7 @@ export default class RemoveCommand extends BaseCommand {
             name: "remove",
             aliases: ["rem"],
             category: "music",
-            description: "Removes a track/ multiple tracks from the queue."
+            description: "Remove a track/ multiple tracks from the queue."
         })
     }
 
@@ -41,9 +41,9 @@ export default class RemoveCommand extends BaseCommand {
 
         if (!ctx.args.length) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide the position or name of the song to remove from the queue!", true));
 
-        if (ctx.args.length && ctx.args[0] && !isNaN(parseInt(ctx.args[0])) && (!ctx.args[1] || !isNaN(parseInt(ctx.args[1])))) {
+        if (ctx.args.length && ctx.args[0] && !Number.isNaN(ctx.args[0]) && (!ctx.args[1] || !Number.isNaN(ctx.args[1]))) {
             start = parseInt(ctx.args[0]);
-            if (ctx.args[1] && !isNaN(parseInt(ctx.args[1]))) end = parseInt(ctx.args[1]);
+            if (ctx.args[1] && !Number.isNaN(ctx.args[1])) end = parseInt(ctx.args[1]);
         }
 
         if (start == null) {

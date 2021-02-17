@@ -8,7 +8,7 @@ export default class ResumeCommand extends BaseCommand {
             name: "resume",
             aliases: ["res"],
             category: "music",
-            description: "Resumes the player."
+            description: "Resume the player."
         })
     }
 
