@@ -24,7 +24,7 @@ export default class PauseCommand extends BaseCommand {
         if (res.isError) return;
 
         if (res.player && res.player.paused) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "The player is already paused!", true));
-        if (!res.player || !res.player.queue.current) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "There is nothing playing right now!", true));
+        if (!res.player?.queue.current) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "There is nothing playing right now!", true));
 
         res.player?.pause(true);
 

@@ -29,7 +29,7 @@ export class QueueMessage {
 
         this.message = await this.channel.send(queueEmbed);
 
-        if (this.pages.length > 2) {
+        if (this.pages.length > 1) {
             const filter = (reaction: MessageReaction, user: User) => user.id !== user.client.user!.id;
             this.reactionCollector = this.message.createReactionCollector(filter, { time: 45000 });
 
@@ -66,8 +66,8 @@ export class QueueMessage {
                     case Utils.appearance.emojis.arrow_right:
                         if (this.message && !this.message.deleted) {
                             this.updatePages();//Untested
-                            if (this.currentPage > this.pages.length) this.currentPage = this.pages.length - 2;//Untested
-                            if (this.currentPage + 1 > this.pages.length) return;
+                            if (this.currentPage > this.pages.length) this.currentPage = this.pages.length - 1;//Untested
+                            if (this.currentPage + 2 > this.pages.length) return;
                             else {
                                 ++this.currentPage;
                                 await this.updateMessage();
