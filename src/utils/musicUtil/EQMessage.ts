@@ -1,4 +1,4 @@
-import { Utils, MusicUtil } from '../Utils';
+import { Utils } from '../Utils';
 import { Player } from '6ec0bd7f/dist';
 import { GuildMember, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import GlobalCTX from '../GlobalCTX';
@@ -37,7 +37,7 @@ export default class EQMessage {
     }
 
     async send() {
-        this.message = await this.channel.send(convertBandsToGraph(this.bands) + (this.viewOnly ? `\n[View Only]` : `\n[It may take up to 10 seconds for your changes to take effect]`), { code: true });
+        this.message = await this.channel.send(convertBandsToGraph(this.bands) + (this.viewOnly ? `\n[No permission to modify]` : `\n[It may take up to 10 seconds for your changes to take effect]`), { code: true });
 
         if (this.viewOnly) this.message.delete({ timeout: 45000 });
         else {

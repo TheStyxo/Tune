@@ -1,5 +1,5 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
-import { MusicUtil, CustomError, Success } from '../../utils/Utils';
+import { MusicUtil, CustomError, Success, FLAG } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 import { VoiceChannel } from 'discord.js';
 
@@ -16,7 +16,7 @@ export default class SummonCommand extends BaseCommand {
     async run(ctx: CommandCTX, opts?: Success | CustomError): Promise<Success | CustomError> {
         if (!ctx.permissions.has("EMBED_LINKS")) {
             await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-            return new CustomError(0, "NO_EMBED_PERMISSION");
+            return new CustomError(FLAG.NO_EMBED_PERMISSION);
         }
 
         const res = await this.testConditions(ctx, opts);
@@ -39,7 +39,7 @@ export default class SummonCommand extends BaseCommand {
                 await ctx.channel.send(reconnectedEmbed).catch((err: Error) => this.globalCTX.logger?.error(err.message));;
             }
             player.connect();
-            return new Success(0, "RESPAWNED");
+            return new Success(FLAG.RESPAWNED);
         }
 
         player = this.globalCTX.lavalinkClient.create({
@@ -84,7 +84,7 @@ export default class SummonCommand extends BaseCommand {
         }
 
 
-        return new Success(0, "", undefined, res.authorVoiceChannel, player);
+        return new Success(FLAG.NULL, undefined, res.authorVoiceChannel, player);
     }
     async testConditions(ctx: CommandCTX, prevRes?: Success | CustomError): Promise<Success | CustomError> {
         const res = prevRes || MusicUtil.canModifyPlayer({
@@ -102,17 +102,17 @@ export default class SummonCommand extends BaseCommand {
 
         if (!authorVCperms || !authorVCperms.has("VIEW_CHANNEL")) {
             await ctx.channel.send(this.utils.embedifyString(ctx.guild, `${await this.utils.getEmoji("voice_channel_icon_error_locked")} I don't have permissions to view your channel!`, true));
-            return new CustomError(12, "NO_BOT_PERMS_VIEW_CHANNEL");
+            return new CustomError(FLAG.NO_BOT_PERMS_VIEW_CHANNEL);
         }
         if (!authorVCperms || !authorVCperms.has("CONNECT")) {
             await ctx.channel.send(this.utils.embedifyString(ctx.guild, `${await this.utils.getEmoji("voice_channel_icon_error_locked")} I don't have permissions to join your channel!`, true));
-            return new CustomError(13, "NO_BOT_PERMS_CONNECT");
+            return new CustomError(FLAG.NO_BOT_PERMS_CONNECT);
         }
         if (!authorVCperms || !authorVCperms.has("SPEAK")) {
             await ctx.channel.send(this.utils.embedifyString(ctx.guild, `${await this.utils.getEmoji("voice_channel_icon_normal_locked")} I don't have permissions to speak in your channel!`, true));
-            return new CustomError(14, "NO_BOT_PERMS_SPEAK");
+            return new CustomError(FLAG.NO_BOT_PERMS_SPEAK);
         }
 
-        return new Success(0, "SUCCESS", undefined, res.authorVoiceChannel);
+        return new Success(FLAG.NULL, undefined, res.authorVoiceChannel);
     }
 }
