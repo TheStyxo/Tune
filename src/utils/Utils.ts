@@ -244,16 +244,14 @@ export class Utils {
 
 export class CustomError {
     // Class props //
-    code?: number;
-    flag?: string;
+    flag: FLAG;
     memberPerms: InternalPermissions;
     missingPerms?: string[]
     isPermsError = false;
     readonly isSuccess = false;
     readonly isError = true;
     // Class props //
-    constructor(code: number, flag: string, memberPerms?: InternalPermissions, missingPerms?: string[]) {
-        this.code = code;
+    constructor(flag: FLAG, memberPerms?: InternalPermissions, missingPerms?: string[]) {
         this.flag = flag;
         this.memberPerms = memberPerms || new InternalPermissions(0);
         if (missingPerms && missingPerms.length > 0) {
@@ -265,16 +263,14 @@ export class CustomError {
 
 export class Success {
     // Class props //
-    code: number;
-    flag: string;
+    flag: FLAG;
     memberPerms: InternalPermissions;
     authorVoiceChannel?: discord.VoiceChannel;
     player?: Player;
     readonly isSuccess = true;
     readonly isError = false;
     // Class props //
-    constructor(code: number, flag: string, memberPerms?: InternalPermissions, authorVoiceChannel?: discord.VoiceChannel, player?: Player) {
-        this.code = code;
+    constructor(flag: FLAG, memberPerms?: InternalPermissions, authorVoiceChannel?: discord.VoiceChannel, player?: Player) {
         this.flag = flag;
         this.memberPerms = memberPerms || new InternalPermissions(0);
         this.authorVoiceChannel = authorVoiceChannel;
@@ -282,54 +278,77 @@ export class Success {
     }
 }
 
+export enum FLAG {
+    NULL = 1 << 0,
+    NO_PLAYER = 1 << 1,
+    PLAYER_ALREADY_EXISTS = 1 << 2,
+    NO_AUTHOR_CHANNEL_AND_PLAYER_EXISTS = 1 << 3,
+    PLAYER_IN_DIFFERENT_CHANNEL = 1 << 4,
+    PLAYER_ALREADY_EXISTS_SAME_CHANNEL = 1 << 5,
+    NO_PERMS_AND_NOT_ALONE = 1 << 6,
+    NO_VOICE_CHANNEL = 1 << 7,
+    NO_PERMS_TO_SPAWN_PLAYER = 1 << 8,
+    NO_PERMS_AND_NO_PLAYER = 1 << 9,
+    HAS_PERMS = 1 << 10,
+    NO_PERMS_BUT_ALONE = 1 << 11,
+    HAS_PERMS_TO_SPAWN_PLAYER = 1 << 12,
+    HAS_PERMS_AND_NO_PLAYER = 1 << 13,
+    VIEW_ONLY = 1 << 14,
+    NO_EMBED_PERMISSION = 1 << 15,
+    RESPAWNED = 1 << 16,
+    NO_BOT_PERMS_VIEW_CHANNEL = 1 << 17,
+    NO_BOT_PERMS_CONNECT = 1 << 18,
+    NO_BOT_PERMS_SPEAK = 1 << 19,
+}
+
 export class MusicUtil {
     private static async sendError(message: string, channel: discord.TextChannel) {
         return await channel.send(Utils.embedifyString(channel.guild, message, true));
     }
     public static canModifyPlayer(options: CanModifyPlayerOptions): Success | CustomError {
-        const { guild, member, textChannel, memberPermissions, requiredPermissions, vcMemberAmtForAllPerms, noPlayerRequired, isSpawnAttempt, sendError } = Object.assign({ vcMemberAmtForAllPerms: 2, noPlayerRequired: false, isSpawnAttempt: false, sendError: true }, options);
+        const { guild, member, textChannel, memberPermissions, requiredPermissions, vcMemberAmtForAllPerms, noPlayerRequired, isSpawnAttempt, sendError, allowViewOnly } = Object.assign({ vcMemberAmtForAllPerms: 2, noPlayerRequired: false, isSpawnAttempt: false, sendError: true, allowViewOnly: false }, options);
         const player = GlobalCTX.lavalinkClient.players.get(guild.id);
         const { channel: botVc } = guild.me?.voice || {};
         const { channel: memberVc } = member.voice;
 
         if (!noPlayerRequired && !player) {
             if (sendError) this.sendError("There is nothing playing right now!", textChannel);
-            return new CustomError(1, "NO_PLAYER", memberPermissions);
+            return new CustomError(FLAG.NO_PLAYER, memberPermissions);
         }
 
         if (player && botVc) {
             if (!memberVc) {
                 if (isSpawnAttempt) {
                     if (sendError) this.sendError("Already playing in a different channel!", textChannel);
-                    return new CustomError(2, "PLAYER_ALREADY_EXISTS", memberPermissions);
+                    return new CustomError(FLAG.PLAYER_ALREADY_EXISTS, memberPermissions);
                 }
                 if (sendError) this.sendError("You need to be in the same voice channel as the bot to use that command!", textChannel);
-                return new CustomError(3, "NO_AUTHOR_CHANNEL_AND_PLAYER_EXISTS", memberPermissions);
+                return new CustomError(FLAG.NO_AUTHOR_CHANNEL_AND_PLAYER_EXISTS, memberPermissions);
             }
             else {
                 if (memberVc.id !== botVc.id) {
                     if (isSpawnAttempt) {
                         if (sendError) this.sendError("Already playing in a different channel!", textChannel);
-                        return new CustomError(2, "PLAYER_ALREADY_EXISTS", memberPermissions);
+                        return new CustomError(FLAG.PLAYER_ALREADY_EXISTS, memberPermissions);
                     }
                     if (sendError) this.sendError("You need to be in the same voice channel as the bot to use that command!", textChannel);
-                    return new CustomError(4, "PLAYER_IN_DIFFERENT_CHANNEL", memberPermissions);
+                    return new CustomError(FLAG.PLAYER_IN_DIFFERENT_CHANNEL, memberPermissions);
                 }
                 else {
                     if (isSpawnAttempt) {
                         if (sendError) this.sendError("Already playing in your voice channel!", textChannel);
-                        return new CustomError(5, "PLAYER_ALREADY_EXISTS_SAME_CHANNEL", memberPermissions);
+                        return new CustomError(FLAG.PLAYER_ALREADY_EXISTS_SAME_CHANNEL, memberPermissions);
                     }
                     const vcMemberCount = memberVc.members.filter(m => !m.user.bot).size;
                     const missingPerms = memberPermissions.missing(requiredPermissions);
                     const hasPerms = !missingPerms || missingPerms.length === 0;
-                    if (hasPerms) return new Success(1, "HAS_PERMS", memberPermissions, memberVc, player);
+                    if (hasPerms) return new Success(FLAG.HAS_PERMS, memberPermissions, memberVc, player);
                     else {
                         if (vcMemberCount > vcMemberAmtForAllPerms) {
                             if (sendError) this.sendError(`You dont have \`${missingPerms.join("`, `")}\` permission${missingPerms.length > 1 ? `s` : ``} to do that!\nBeing alone in the channel works too!`, textChannel);
-                            return new CustomError(6, "NO_PERMS_AND_NOT_ALONE", memberPermissions);
+                            return new CustomError(FLAG.NO_PERMS_AND_NOT_ALONE, memberPermissions);
                         }
-                        return new Success(2, "NO_PERMS_AND_ALONE", memberPermissions, memberVc, player);
+                        return new Success(FLAG.NO_PERMS_BUT_ALONE, memberPermissions, memberVc, player);
                     }
                 }
             }
@@ -340,29 +359,32 @@ export class MusicUtil {
             if (hasPerms) {
                 if (isSpawnAttempt && !memberVc) {
                     if (sendError) this.sendError("You need to be in a voice channel to use that command!", textChannel);
-                    return new CustomError(7, "NO_VOICE_CHANNEL", memberPermissions);
+                    return new CustomError(FLAG.NO_VOICE_CHANNEL, memberPermissions);
                 }
-                if (isSpawnAttempt) return new Success(3, "HAS_PERMS_TO_SPAWN_PLAYER", memberPermissions, memberVc!);
-                return new Success(4, "HAS_PERMS_AND_NO_PLAYER", memberPermissions);
+                if (isSpawnAttempt) return new Success(FLAG.HAS_PERMS_TO_SPAWN_PLAYER, memberPermissions, memberVc!);
+                return new Success(FLAG.HAS_PERMS_AND_NO_PLAYER, memberPermissions);
             }
             else {
                 if (isSpawnAttempt) {
                     if (!memberVc) {
                         if (sendError) this.sendError("You need to be in a voice channel to use that command!", textChannel);
-                        return new CustomError(7, "NO_VOICE_CHANNEL", memberPermissions);
+                        return new CustomError(FLAG.NO_VOICE_CHANNEL, memberPermissions);
                     }
                     else {
                         const vcMemberCount = memberVc.members.filter(m => !m.user.bot).size;
                         if (vcMemberCount > vcMemberAmtForAllPerms) {
                             if (sendError) this.sendError(`You dont have \`${missingPerms.join("`, `")}\` permission${missingPerms.length > 1 ? `s` : ``} to do that!\nBeing alone in the channel works too!`, textChannel);
-                            return new CustomError(8, "NO_PERMS_TO_SPAWN_PLAYER", memberPermissions);
+                            return new CustomError(FLAG.NO_PERMS_TO_SPAWN_PLAYER, memberPermissions);
                         }
-                        return new Success(2, "NO_PERMS_AND_ALONE", memberPermissions, memberVc);
+                        return new Success(FLAG.NO_PERMS_BUT_ALONE, memberPermissions, memberVc);
                     }
                 }
                 else {
-                    if (sendError) this.sendError("There is nothing playing right now!", textChannel);
-                    return new CustomError(9, "NO_PERMS_AND_NO_PLAYER", memberPermissions);
+                    if (allowViewOnly) return new Success(FLAG.VIEW_ONLY, memberPermissions);
+                    else {
+                        if (sendError) this.sendError("There is nothing playing right now!", textChannel);
+                        return new CustomError(FLAG.NO_PERMS_AND_NO_PLAYER, memberPermissions);
+                    }
                 }
             }
         }
@@ -377,7 +399,8 @@ export interface CanModifyPlayerOptions {
     vcMemberAmtForAllPerms?: number,
     noPlayerRequired?: boolean,
     isSpawnAttempt?: boolean,
-    sendError?: boolean
+    sendError?: boolean,
+    allowViewOnly?: boolean
 }
 
 export type CanModifyPlayerResult = {

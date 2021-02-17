@@ -1,22 +1,19 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
-import { MusicUtil, FLAG } from '../../utils/Utils';
+import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
-import EQMessage from '../../utils/musicUtil/EQMessage';
 
-export default class EqualizerCommand extends BaseCommand {
+export default class ResumeCommand extends BaseCommand {
     constructor() {
         super({
-            name: "equalizer",
-            aliases: ["eq"],
+            name: "resume",
+            aliases: ["res"],
             category: "music",
-            description: "Change or view the eq settings."
+            description: "Resumes the player."
         })
     }
 
     async run(ctx: CommandCTX) {
         if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
-        let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
 
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
@@ -24,13 +21,16 @@ export default class EqualizerCommand extends BaseCommand {
             textChannel: ctx.channel,
             requiredPermissions: ["MANAGE_PLAYER"],
             memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
-            noPlayerRequired: true,
-            allowViewOnly: true
         });
         if (res.isError) return;
 
-        if (!player) player = res.player;
+        if (res.player && res.player.playing) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "The player is already playing!", true));
+        if (!res.player?.queue.current) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "There is nothing in the queue right now!", true));
 
-        return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY, modifyDB: res.memberPerms.has("MANAGE_PLAYER") }).send();
+        res.player?.pause(false);
+
+        const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Resumed the player!`);
+        await ctx.channel.send(embedified);
+        if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
     }
 }

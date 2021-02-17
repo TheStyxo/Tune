@@ -1,6 +1,5 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { CustomError, MusicUtil, Success } from '../../utils/Utils';
-import { VoiceChannel } from 'discord.js';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 
 export default class PlayCommand extends BaseCommand {

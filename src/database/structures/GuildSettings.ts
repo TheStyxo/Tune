@@ -108,7 +108,7 @@ export class GuildMusicSettings {
      * @param value Boolean for 24x7 mode
      */
     async set24_7(value: boolean): Promise<boolean> {
-        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { "settings.music.24_7": value }, { upsert: true });
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.24_7": value } }, { upsert: true });
         return this.GuildSettings._data.settings.music["24_7"] = value;
     }
 
@@ -124,7 +124,7 @@ export class GuildMusicSettings {
      * @param value [TRACK | QUEUE | DISABLED]
      */
     async setLoop(value: ILoop): Promise<ILoop> {
-        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { "settings.music.loop": value }, { upsert: true });
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.loop": value } }, { upsert: true });
         return this.GuildSettings._data.settings.music.loop = value;
     }
 }

@@ -1,4 +1,4 @@
-import { Utils, MusicUtil } from '../Utils';
+import { Utils } from '../Utils';
 import { Player } from '6ec0bd7f/dist';
 import { GuildMember, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import GlobalCTX from '../GlobalCTX';
@@ -9,7 +9,8 @@ export interface EQMessageOptions {
     player?: Player,
     guildSettings?: GuildSettings,
     viewOnly: boolean,
-    requestedBy: GuildMember
+    requestedBy: GuildMember,
+    modifyDB: boolean
 }
 
 export default class EQMessage {
@@ -21,12 +22,14 @@ export default class EQMessage {
     message?: Message;
     reactionCollector?: ReactionCollector;
     cursor = 0;
+    modifyDB: boolean;
     // Class props //
-    constructor({ channel, guildSettings, viewOnly, requestedBy }: EQMessageOptions) {
+    constructor({ channel, guildSettings, viewOnly, requestedBy, modifyDB }: EQMessageOptions) {
         this.channel = channel;
         this.requestedBy = requestedBy;
         this.guildSettings = guildSettings;
         this.viewOnly = viewOnly;
+        this.modifyDB = modifyDB;
     }
 
     get player() {
@@ -37,7 +40,7 @@ export default class EQMessage {
     }
 
     async send() {
-        this.message = await this.channel.send(convertBandsToGraph(this.bands) + (this.viewOnly ? `\n[View Only]` : `\n[It may take up to 10 seconds for your changes to take effect]`), { code: true });
+        this.message = await this.channel.send(convertBandsToGraph(this.bands) + (this.viewOnly ? `\n[No permission to modify]` : `\n[It may take up to 10 seconds for your changes to take effect]`), { code: true });
 
         if (this.viewOnly) this.message.delete({ timeout: 45000 });
         else {
@@ -89,9 +92,10 @@ export default class EQMessage {
                             const changedBandGain = parseFloat((currentBandGain + 0.1).toFixed(1));
 
                             if (changedBandGain <= 1) {
-                                if (this.player) await this.player.setEQ({ band: this.cursor - 1, gain: changedBandGain });
-                                //Check if author has permission
-                                //if (modifyDB) await await guildData.settings.music.eq.setEQ([{ band: cursor - 1, gain: changedBandGain }]);
+                                const newBand = { band: this.cursor - 1, gain: changedBandGain };
+
+                                if (this.player) this.player.setEQ(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }
@@ -104,9 +108,10 @@ export default class EQMessage {
                             const changedBandGain = parseFloat((currentBandGain - 0.1).toFixed(1));
 
                             if (changedBandGain >= -0.3) {
-                                if (this.player) await this.player.setEQ({ band: this.cursor - 1, gain: changedBandGain })
-                                //Check if author has permission
-                                //if (modifyDB) await guildData.settings.music.eq.setEQ([{ band: cursor - 1, gain: changedBandGain }]);
+                                const newBand = { band: this.cursor - 1, gain: changedBandGain };
+
+                                if (this.player) this.player.setEQ(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }
