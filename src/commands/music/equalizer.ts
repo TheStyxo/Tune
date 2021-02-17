@@ -31,6 +31,6 @@ export default class EqualizerCommand extends BaseCommand {
 
         if (!player) player = res.player;
 
-        return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY }).send();
+        return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY, modifyDB: res.memberPerms.has("MANAGE_PLAYER") }).send();
     }
 }
