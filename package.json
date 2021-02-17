@@ -1,6 +1,6 @@
 {
   "name": "tune-lavalink-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Custom lavalink client for Tune Music Bot.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .ts ./src",
-    "types": "dts-bundle --removeSource --name 6ec0bd7f/dist --main ./dist --out ../dist/index.d.ts --baseDir ./dist",
+    "types": "dts-bundle --removeSource --name tune-lavalink-client --main ./dist --out ../index.d.ts --baseDir ./dist",
     "docs": "typedoc --json ./docs.json --mode file --excludeProtected --excludePrivate --excludeExternals src/structures",
     "publish:stable": "yarn build && yarn types && yarn publish --access=public",
     "publish:beta": "yarn build && yarn types && yarn publish --tag beta --access=public"
@@ -18,10 +18,7 @@
   "keywords": [],
   "author": "Styxo (https://github.com/theStyxo)",
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TheStyxo/Tune.git"
-  },
+  "repository": "git+https://github.com/TheStyxo/Tune.git",
   "bugs": {
     "url": "https://github.com/TheStyxo/Tune/issues"
   },
