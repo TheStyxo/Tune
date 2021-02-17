@@ -551,8 +551,8 @@ export class Player {
   }
 
   /** Reset all audio filters except eq */
-  resetFilters() {
-    this.filters = {};
+  setFilters(filters: Filters) {
+    this.filters = filters;
     this.node.send({
       op: "filters",
       guildId: this.guild,
