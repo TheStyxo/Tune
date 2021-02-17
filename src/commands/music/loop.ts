@@ -55,7 +55,7 @@ export default class LoopCommand extends BaseCommand {
                     break;
             }
 
-            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the loop to ${loop}.`);
+            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the loop to ${loop.toLowerCase()}.`);
             await ctx.channel.send(embedified);
             if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
         }

@@ -1,7 +1,8 @@
 import Utils, { Utils as Util } from '../Utils';
 import { Player, Track } from '6ec0bd7f/dist';
-import { Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
+import { Guild, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import GlobalCTX from '../GlobalCTX';
+import { CommandCTX } from '../structures/BaseCommand';
 
 export default class PlayingMessage {
     // Class props //
@@ -75,7 +76,32 @@ export default class PlayingMessage {
 
             await reaction.users.remove(user).catch((err: Error) => GlobalCTX.logger?.error(err.message));
 
-            switch (reaction.emoji.id) { }
+            switch (reaction.emoji.id) {
+                case Util.appearance.emojis.like:
+                    await runCommand("like", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.shuffle:
+                    await runCommand("shuffle", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.previous_track:
+                    await runCommand("back", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.play_or_pause:
+                    await runCommand("play", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.next_track:
+                    await runCommand("skip", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.loop:
+                    await runCommand("loop", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.stop:
+                    await runCommand("stop", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+                case Util.appearance.emojis.disconnect:
+                    await runCommand("disconnect", user, reaction.message.channel as TextChannel, reaction.message.guild!);
+                    break;
+            }
         });
 
         /**
@@ -96,4 +122,21 @@ export default class PlayingMessage {
         if (this.message.deletable && !this.message.deleted) this.message.delete().catch((err: Error) => GlobalCTX.logger?.error(err.message));
         delete this.message;
     }
+}
+
+async function runCommand(commandName: string, user: User, channel: TextChannel, guild: Guild) {
+    const command = GlobalCTX.commands.get(commandName);
+    if (!command) return;
+
+    const ctx: CommandCTX = {
+        command,
+        args: [],
+        member: guild.member(user)!,
+        channel,
+        guild, guildData: await GlobalCTX.DB!.getGuild(guild.id),
+        guildSettings: await GlobalCTX.DB!.getGuildSettings(guild.id),
+        client: guild.client, recievedTimestamp: Date.now(),
+        permissions: channel.permissionsFor(GlobalCTX.client.user!) || new Util.discord.Permissions(0)
+    }
+    return await command.run(ctx);
 }
