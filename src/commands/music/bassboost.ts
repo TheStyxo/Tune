@@ -2,8 +2,8 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 const mainBassBand = 1;
-const bassBands = [1, 2]
-const effectivenessOnBand = [100, 60]
+const bassBands = [0, 1, 2, 3];
+const effectivenessOnBand = [50, 100, 80, 60];
 
 export default class BassboostCommand extends BaseCommand {
     constructor() {
@@ -36,9 +36,9 @@ export default class BassboostCommand extends BaseCommand {
 
         if (!player) player = res.player;
 
-        const bassboostString = ctx.args[0].replace(/%*/g, "");
+        const bassboostString = ctx.args[0].replace(/%*/g, "").replace(/(re)(?:(s|se|set)?)/, "0");
         const bassboostRequested = Number.isNaN(bassboostString) ? null : parseInt(bassboostString);
-        if (!bassboostRequested || bassboostRequested < -100 || bassboostRequested > 400) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between -100 and 400 to set the bassboost to!", true));
+        if (bassboostRequested === null || bassboostRequested < -100 || bassboostRequested > 400) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between -100 and 400 to set the bassboost to!", true));
         const bassboostGain = convertFromPercent(bassboostRequested);
 
         const bandsArray = [];
