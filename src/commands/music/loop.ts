@@ -2,7 +2,7 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { FLAG, MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 
-export default class VolumeCommand extends BaseCommand {
+export default class LoopCommand extends BaseCommand {
     constructor() {
         super({
             name: "loop",
@@ -24,7 +24,7 @@ export default class VolumeCommand extends BaseCommand {
             requiredPermissions: ["MANAGE_PLAYER"],
             memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
             noPlayerRequired: true,
-            allowViewOnly: true
+            allowViewOnly: !ctx.args.length
         });
         if (res.isError) return;
 

@@ -2,7 +2,6 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 import { Player, Track } from '6ec0bd7f/dist';
-//@ts-expect-error Coz string progressbar is not for ts
 import createBar from 'string-progressbar';
 
 export default class NowPlayingCommand extends BaseCommand {
