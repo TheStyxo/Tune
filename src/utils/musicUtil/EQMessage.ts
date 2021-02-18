@@ -58,7 +58,8 @@ export default class EQMessage {
                 Utils.appearance.emojis.arrow_left,
                 Utils.appearance.emojis.arrow_up,
                 Utils.appearance.emojis.arrow_down,
-                Utils.appearance.emojis.arrow_right
+                Utils.appearance.emojis.arrow_right,
+                Utils.appearance.emojis.reset
             ];
 
             /**
@@ -120,6 +121,12 @@ export default class EQMessage {
 
                     case Utils.appearance.emojis.arrow_right:
                         if (this.cursor + 1 <= 15) this.cursor += 1;
+                        await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
+                        break;
+                    case Utils.appearance.emojis.reset:
+                        if (this.player) this.player.clearEQ();
+                        if (this.modifyDB) await this.guildSettings?.music.clearEQ();
+
                         await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                         break;
                 }
