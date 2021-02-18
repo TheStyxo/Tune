@@ -15,6 +15,19 @@ export default class NightcoreCommand extends BaseCommand {
     async run(ctx: CommandCTX) {
         if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
 
+        if (ctx.args.length) {
+            switch (ctx.args[0]) {
+                case "speed":
+                case "sp":
+                    ctx.args.shift();
+                    return this.globalCTX.commands.get("speed")!.run(ctx);
+                case "pitch":
+                case "pit":
+                    ctx.args.shift();
+                    return this.globalCTX.commands.get("pitch")!.run(ctx);
+            }
+        }
+
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,
@@ -35,8 +48,8 @@ export default class NightcoreCommand extends BaseCommand {
         }
         else {
             const timescale = {
-                speed: 1.0999999993162842,
-                pitch: 1.2999999523162842
+                speed: 1.09,
+                pitch: 1.29
             };
 
             res.player?.setTimescale(timescale);
