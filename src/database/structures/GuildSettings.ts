@@ -90,13 +90,11 @@ export class GuildPermissions {
 export class GuildMusicSettings {
     // Class props //
     GuildSettings: GuildSettings;
-    eq: EQSettings;
     volume: GuildVolumeSettings;
     // Class props //
 
     constructor(GuildSettings: GuildSettings) {
         this.GuildSettings = GuildSettings;
-        this.eq = new EQSettings(this.GuildSettings);
         this.volume = new GuildVolumeSettings(this.GuildSettings);
     }
 
@@ -193,38 +191,35 @@ export class GuildMusicSettings {
         return this;
     }
 
-    /** Reset all audio filters except eq */
-    async setFilters(filters: Filters): Promise<this> {
-        this.GuildSettings._data.settings.music.filters = filters;
-        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters": this.GuildSettings._data.settings.music.filters } }, { upsert: true });
-        return this;
-    }
-}
-
-class EQSettings {
-    // Class props //
-    GuildSettings: GuildSettings;
-    // Class props //
-
-    constructor(GuildSettings: GuildSettings) {
-        this.GuildSettings = GuildSettings;
-    }
-
-    get bands(): number[] {
-        return this.GuildSettings._data.settings.music.eq.bands;
-    }
-
-    async setBands(...bands: EqualizerBand[]): Promise<this> {
+    /**
+    * Sets the equalizer filter.
+    * @param {Filters["rotation"]} options Rotation options
+    */
+    async setEQ(...bands: EqualizerBand[]): Promise<this> {
         // Hacky support for providing an array
         if (Array.isArray(bands[0])) bands = bands[0] as unknown as EqualizerBand[]
 
         if (!bands.length || !bands.every((band) => JSON.stringify(Object.keys(band).sort()) === '["band","gain"]'))
             throw new TypeError("Bands must be a non-empty object array containing 'band' and 'gain' properties.");
 
-        for (const { band, gain } of bands) this.GuildSettings._data.settings.music.eq.bands[band] = gain;
+        if (!this.GuildSettings._data.settings.music.filters.equalizer) this.GuildSettings._data.settings.music.filters.equalizer = Array(15).fill(0);
 
-        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.eq.bands": this.GuildSettings._data.settings.music.eq.bands } });
+        for (const { band, gain } of bands) this.GuildSettings._data.settings.music.filters.equalizer[band] = { band, gain };
 
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.equalizer": this.GuildSettings._data.settings.music.filters.equalizer } });
+
+        return this;
+    }
+
+    async clearEQ() {
+        delete this.GuildSettings._data.settings.music.filters.equalizer;
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.equalizer": null } });
+    }
+
+    /** Reset all audio filters except eq */
+    async setFilters(filters: Filters): Promise<this> {
+        this.GuildSettings._data.settings.music.filters = filters;
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters": this.GuildSettings._data.settings.music.filters } }, { upsert: true });
         return this;
     }
 }

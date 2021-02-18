@@ -36,7 +36,7 @@ export default class EQMessage {
         return GlobalCTX.lavalinkClient.players.get(this.channel.guild.id);
     }
     get bands() {
-        return (this.player?.bands || this.guildSettings?.music.eq.bands) ?? (Array(15).fill(0) as number[]);
+        return (this.player?.bands || this.guildSettings?.music.filters.equalizer?.map(v => v.gain)) ?? (Array(15).fill(0) as number[]);
     }
 
     async send() {
@@ -95,7 +95,7 @@ export default class EQMessage {
                                 const newBand = { band: this.cursor - 1, gain: changedBandGain };
 
                                 if (this.player) this.player.setEQ(newBand);
-                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.setEQ(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }
@@ -111,7 +111,7 @@ export default class EQMessage {
                                 const newBand = { band: this.cursor - 1, gain: changedBandGain };
 
                                 if (this.player) this.player.setEQ(newBand);
-                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.setEQ(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }

@@ -40,9 +40,6 @@ export interface IGuildSettingsData {
         music: {
             "24_7": boolean,
             loop: ILoop,
-            eq: {
-                bands: number[]
-            },
             volume: {
                 percentage: number,
                 limit: number

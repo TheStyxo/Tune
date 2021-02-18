@@ -21,7 +21,7 @@ export default class BassboostCommand extends BaseCommand {
         let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
 
         if (!ctx.args.length) {
-            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current bassboost is set to ${convertToPercent(player?.bands[mainBassBand] || ctx.guildSettings.music.eq.bands[mainBassBand])}%`));
+            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current bassboost is set to ${convertToPercent(player?.bands[mainBassBand] || (ctx.guildSettings.music.filters.equalizer?.map(v => v.gain) || Array(15).fill(0))[mainBassBand])}% `));
         }
 
         const res = MusicUtil.canModifyPlayer({
@@ -46,9 +46,11 @@ export default class BassboostCommand extends BaseCommand {
             bandsArray.push({ band: bassBands[index], gain: parseFloat(((effectivenessOnBand[index] / 100) * bassboostGain).toFixed(2)) });
         }
 
+        console.log(bandsArray);
+
         player?.setEQ(...bandsArray);
 
-        if (ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member).has("MANAGE_PLAYER")) await ctx.guildSettings.music.eq.setBands(...bandsArray);
+        if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setEQ(...bandsArray);
 
         const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the bassboost to ${bassboostRequested}%.`);
         await ctx.channel.send(embedified);
