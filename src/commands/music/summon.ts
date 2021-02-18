@@ -1,7 +1,6 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil, CustomError, Success, FLAG } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
-import { VoiceChannel } from 'discord.js';
 
 export default class SummonCommand extends BaseCommand {
     constructor() {

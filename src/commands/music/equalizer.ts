@@ -9,7 +9,8 @@ export default class EqualizerCommand extends BaseCommand {
             name: "equalizer",
             aliases: ["eq"],
             category: "music",
-            description: "Change or view the eq settings."
+            description: "Change or view the eq settings.",
+            cooldown: 30000
         })
     }
 
@@ -26,6 +27,16 @@ export default class EqualizerCommand extends BaseCommand {
             allowViewOnly: true
         });
         if (res.isError) return;
+
+        if (ctx.args.length && res.memberPerms.has("MANAGE_PLAYER") && ctx.args[0].replace(/(re)(?:(s|se|set)?)/, "reset") === "reset") {
+            res.player?.clearEQ();
+            await ctx.guildSettings?.music.clearEQ();
+
+            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Successfully reset the equalizer settings.`);
+            await ctx.channel.send(embedified);
+            if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
+            return;
+        }
 
         return await new EQMessage({ channel: ctx.channel, requestedBy: ctx.member, player: res.player, guildSettings: ctx.guildSettings, viewOnly: res.flag === FLAG.VIEW_ONLY, modifyDB: res.memberPerms.has("MANAGE_PLAYER") }).send();
     }

@@ -10,7 +10,7 @@ export default class QueueCommand extends BaseCommand {
             aliases: ["q"],
             category: "music",
             description: "View the music queue.",
-            cooldown: 30000
+            cooldown: 10000
         })
     }
 
