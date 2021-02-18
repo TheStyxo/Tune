@@ -13,9 +13,6 @@ export const DefaultGuildSettingsData = {
         "music": {
             "24_7": false,
             "loop": "DISABLED" as ILoop,
-            "eq": {
-                "bands": Array(15).fill(0)
-            },
             "volume": {
                 "percentage": 100,
                 "limit": 100
