@@ -1,6 +1,7 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
+export const nightcoreValues = { speed: 1.09, pitch: 1.29, rate: 1 };
 
 export default class NightcoreCommand extends BaseCommand {
     constructor() {
@@ -47,13 +48,8 @@ export default class NightcoreCommand extends BaseCommand {
             if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
         }
         else {
-            const timescale = {
-                speed: 1.09,
-                pitch: 1.29
-            };
-
-            res.player?.setTimescale(timescale);
-            if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setTimescale(timescale);
+            res.player?.setTimescale(nightcoreValues);
+            if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setTimescale(nightcoreValues);
 
             const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Enabled the nightcore mode.`);
             await ctx.channel.send(embedified);

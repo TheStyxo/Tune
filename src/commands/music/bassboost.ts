@@ -1,8 +1,8 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
-const mainBassBand = 1;
-const bassBands = [0, 1, 2, 3];
+export const mainBassBand = 1;
+export const bassBands = [0, 1, 2, 3];
 const effectivenessOnBand = [50, 100, 80, 60];
 
 export default class BassboostCommand extends BaseCommand {
@@ -56,5 +56,5 @@ export default class BassboostCommand extends BaseCommand {
     }
 }
 
-const convertToPercent = (gain: number) => (gain * 100) / 0.25;
-const convertFromPercent = (percent: number) => (percent / 100) * 0.25;
+export const convertToPercent = (gain: number) => (gain * 100) / 0.25;
+export const convertFromPercent = (percent: number) => (percent / 100) * 0.25;
