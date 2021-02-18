@@ -202,7 +202,7 @@ export class GuildMusicSettings {
         if (!bands.length || !bands.every((band) => JSON.stringify(Object.keys(band).sort()) === '["band","gain"]'))
             throw new TypeError("Bands must be a non-empty object array containing 'band' and 'gain' properties.");
 
-        if (!this.GuildSettings._data.settings.music.filters.equalizer) this.GuildSettings._data.settings.music.filters.equalizer = Array(15).fill(0);
+        if (!this.GuildSettings._data.settings.music.filters.equalizer) this.GuildSettings._data.settings.music.filters.equalizer = Array(15).fill(null).map((v, i) => ({ band: i, gain: 0 }));
 
         for (const { band, gain } of bands) this.GuildSettings._data.settings.music.filters.equalizer[band] = { band, gain };
 

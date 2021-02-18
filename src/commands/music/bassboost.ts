@@ -46,8 +46,6 @@ export default class BassboostCommand extends BaseCommand {
             bandsArray.push({ band: bassBands[index], gain: parseFloat(((effectivenessOnBand[index] / 100) * bassboostGain).toFixed(2)) });
         }
 
-        console.log(bandsArray);
-
         player?.setEQ(...bandsArray);
 
         if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setEQ(...bandsArray);
