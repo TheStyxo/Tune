@@ -165,10 +165,12 @@ export class Player {
 
     for (const { band, gain } of bands) this.bands[band] = gain;
 
+    this.filters.equalizer = this.bands.map((gain, band) => ({ band, gain }));
+
     this.node.send({
-      op: "equalizer",
+      op: "filters",
       guildId: this.guild.id,
-      bands: this.bands.map((gain, band) => ({ band, gain })),
+      ...this.filters
     });
 
     return this;
@@ -176,12 +178,12 @@ export class Player {
 
   /** Clears the equalizer bands. */
   public clearEQ(): this {
-    this.bands = new Array(15).fill(0.0);
+    delete this.filters.equalizer;
 
     this.node.send({
-      op: "equalizer",
+      op: "filters",
       guildId: this.guild.id,
-      bands: this.bands.map((gain, band) => ({ band, gain })),
+      ...this.filters
     });
 
     return this;
@@ -573,7 +575,8 @@ export interface Filters {
   },
   rotation?: {
     rotationHz?: number
-  }
+  },
+  equalizer?: EqualizerBand[]
 }
 
 export class InactivityChecker {
