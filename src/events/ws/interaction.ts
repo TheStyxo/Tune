@@ -1,5 +1,5 @@
 import BaseEvent from '../../utils/structures/BaseEvent';
-import { WebSocketManager, GuildMember, TextChannel } from 'discord.js';
+import { WebSocketManager, GuildMember, TextChannel, Util } from 'discord.js';
 import { Utils, Cooldowns } from '../../utils/Utils';
 import { CommandCTX } from '../../utils/structures/BaseCommand';
 
@@ -59,7 +59,7 @@ export default class SlashCommandEvent extends BaseEvent {
 
         if (await Cooldowns.check(command, member.user, channel, null)) return;
 
-        const permissions = channel.permissionsFor(this.globalCTX.client.user!);
+        const permissions = await Utils.getClientPermissionsForChannel(channel, member.user);
         if (!permissions) return;
 
 
