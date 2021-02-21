@@ -1,4 +1,3 @@
-import GlobalCTX from '../../utils/GlobalCTX';
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 
 export default class InviteCommand extends BaseCommand {
@@ -22,6 +21,6 @@ export default class InviteCommand extends BaseCommand {
             color: this.utils.getClientColour(ctx.guild)
         })
 
-        await ctx.channel.send(inviteEmbed).catch((err: Error) => GlobalCTX.logger?.error(err.message));
+        await ctx.channel.send(inviteEmbed).catch((err: Error) => this.globalCTX.logger?.error(err.message));
     }
 }

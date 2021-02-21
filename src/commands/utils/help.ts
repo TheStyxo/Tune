@@ -1,4 +1,3 @@
-import GlobalCTX from '../../utils/GlobalCTX';
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 
 export default class HelpCommand extends BaseCommand {
@@ -19,13 +18,13 @@ export default class HelpCommand extends BaseCommand {
         const helpEmbed = new this.utils.discord.MessageEmbed();
 
         //Get viewable commands
-        const commands = (this.utils.owners.find(u => u.id === ctx.member.id) ? GlobalCTX.commands : GlobalCTX.commands.filter(cmd => !cmd.hidden)).array();
+        const commands = (this.utils.owners.find(u => u.id === ctx.member.id) ? this.globalCTX.commands : this.globalCTX.commands.filter(cmd => !cmd.hidden)).array();
 
         //Get command categories
         const commandCategories: string[] = [];
         for (const command of commands) if (!commandCategories.includes(command.category)) commandCategories.push(command.category);
 
-        const guildSettingsData = await GlobalCTX.DB?.getGuildSettings(ctx.guild.id);
+        const guildSettingsData = await this.globalCTX.DB?.getGuildSettings(ctx.guild.id);
         if (!guildSettingsData) return;
 
         if (!ctx.args[0]) {
@@ -53,8 +52,8 @@ export default class HelpCommand extends BaseCommand {
             const query = processedQuery.join(' ');
 
             const command =
-                GlobalCTX.commands.get(query.toLowerCase()) ||
-                GlobalCTX.commands.find((cmd) => cmd.aliases ? cmd.aliases.includes(query.toLowerCase()) : false);
+                this.globalCTX.commands.get(query.toLowerCase()) ||
+                this.globalCTX.commands.find((cmd) => cmd.aliases ? cmd.aliases.includes(query.toLowerCase()) : false);
 
             //if command is not found, check categories
             const category = command ? null : commandCategories.includes(query) ? query : null;
@@ -79,6 +78,6 @@ export default class HelpCommand extends BaseCommand {
                 .setColor(this.utils.appearance.colours.error);
         }
 
-        await ctx.channel.send(helpEmbed).catch((err: Error) => GlobalCTX.logger?.error(err.message));
+        await ctx.channel.send(helpEmbed).catch((err: Error) => this.globalCTX.logger?.error(err.message));
     }
 }
