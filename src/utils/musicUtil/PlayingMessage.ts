@@ -131,6 +131,7 @@ async function runCommand(commandName: string, user: User, channel: TextChannel,
     const ctx: CommandCTX = {
         command,
         args: [],
+        rawContent: "",
         member: guild.member(user)!,
         channel,
         guild, guildData: await GlobalCTX.DB!.getGuild(guild.id),

@@ -48,7 +48,7 @@ export default class SlashCommandEvent extends BaseEvent {
         if (!this.globalCTX.commands) throw new Error("Commands are not loaded in global CTX.");
 
         const command = this.globalCTX.commands.get(interaction.data.name);
-        if (!command) return;
+        if (!command || !command.allowInteraction) return;
 
         const recievedTimestamp = Date.now();
         const channel = this.globalCTX.client.channels.resolve(interaction.channel_id) as TextChannel;
@@ -71,6 +71,7 @@ export default class SlashCommandEvent extends BaseEvent {
         const ctx: CommandCTX = {
             command,
             args,
+            rawContent: args.join(" "),
             member,
             channel,
             guild,
@@ -78,7 +79,8 @@ export default class SlashCommandEvent extends BaseEvent {
             permissions,
             recievedTimestamp,
             guildData,
-            guildSettings
+            guildSettings,
+            isInteraction: true
         }
 
         try {

@@ -13,6 +13,7 @@ import GuildData from "../database/structures/Guild";
 import GuildSettings from "../database/structures/GuildSettings";
 import { Client } from "discord.js";
 
+
 export type Commands = discord.Collection<BaseCommand["name"], BaseCommand>;
 
 export interface MessageParserCTX {
@@ -73,7 +74,7 @@ export class MessageParser {
 
         if (!usedPrefix) return null;
 
-        const args = message.content.slice(usedPrefix.length).trim().split(/\s+/);
+        const args = message.content.trim().slice(usedPrefix.length).trim().split(/\s+/);
         const commandName = args.shift()?.toLowerCase();
 
         if (!commandName) return null;
@@ -94,7 +95,7 @@ export class MessageParser {
         }
 
 
-        return { command, args, member: message.member as discord.GuildMember, channel, client: message.client, permissions, recievedTimestamp, guild: message.guild, guildData: ctx.guildData, guildSettings: ctx.guildSettings }
+        return { command, args, rawContent: message.content.trim().slice(usedPrefix.length).trim().slice(commandName.length).trim(), member: message.member as discord.GuildMember, channel, client: message.client, permissions, recievedTimestamp, guild: message.guild, guildData: ctx.guildData, guildSettings: ctx.guildSettings, isInteraction: false }
     }
 }
 
