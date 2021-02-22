@@ -13,8 +13,6 @@ export default class HelpCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         const helpEmbed = new this.utils.discord.MessageEmbed();
 
         //Get viewable commands

@@ -3,7 +3,7 @@ import GuildData from '../../database/structures/Guild';
 import GuildSettings from '../../database/structures/GuildSettings';
 //import UserData from '../../database/structures/User';
 import Utils from "../Utils";
-import { GuildMember, TextChannel, Client, Permissions, Guild, Message } from 'discord.js';
+import { GuildMember, TextChannel, Client, Permissions, Guild } from 'discord.js';
 
 export class BaseCommand {
     name: string;
@@ -13,11 +13,12 @@ export class BaseCommand {
     cooldown: number;
     hidden: boolean;
     allowInteraction: boolean;
+    additionalPermsRequired?: Permissions;
     globalCTX = GlobalCTX;
     utils = Utils;
 
     constructor(options?: CommandProps) {
-        const { name, aliases, category, description, cooldown, hidden, allowInteraction } = check(options);
+        const { name, aliases, category, description, cooldown, hidden, allowInteraction, additionalPermsRequired } = check(options);
         this.name = name;
         this.aliases = aliases;
         this.category = category;
@@ -25,6 +26,7 @@ export class BaseCommand {
         this.cooldown = cooldown || 1000;
         this.hidden = hidden || false;
         this.allowInteraction = allowInteraction === undefined ? true : allowInteraction;
+        this.additionalPermsRequired = additionalPermsRequired;
         this.globalCTX = GlobalCTX;
     }
     async run(ctx: CommandCTX, opts?: any): Promise<any> { };
@@ -39,6 +41,7 @@ export interface CommandProps {
     cooldown?: number;
     hidden?: boolean;
     allowInteraction?: boolean;
+    additionalPermsRequired?: Permissions;
 }
 
 function check(options?: CommandProps): CommandProps {
@@ -61,6 +64,8 @@ function check(options?: CommandProps): CommandProps {
 
     if (typeof options.allowInteraction !== 'undefined' && typeof options.allowInteraction !== 'boolean') throw new TypeError("Command option 'allowInteraction' must be of type 'boolean'.");
 
+    if (typeof options.additionalPermsRequired !== 'undefined' && !(options.additionalPermsRequired instanceof Permissions)) throw new TypeError("Command option 'additionalPermsRequired' must be of type 'Discord.Permission'.");
+
     return options;
 }
 
@@ -77,7 +82,8 @@ export interface CommandCTX {
     client: Client,
     permissions: Readonly<Permissions>,
     recievedTimestamp: number,
-    isInteraction?: boolean
+    isInteraction?: boolean,
+    additionalPermsRequired?: Permissions
 }
 
 export default BaseCommand;

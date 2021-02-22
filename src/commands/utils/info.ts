@@ -1,4 +1,5 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
+import { Permissions } from 'discord.js';
 import time from 'ms';
 
 export default class InfoCommand extends BaseCommand {
@@ -7,7 +8,8 @@ export default class InfoCommand extends BaseCommand {
             name: "info",
             aliases: ["i"],
             category: "utils",
-            description: "Get some info about the bot."
+            description: "Get some info about the bot.",
+            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS"])
         })
     }
 

@@ -1,3 +1,4 @@
+import { Permissions } from 'discord.js';
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 
 export default class PingCommand extends BaseCommand {
@@ -6,13 +7,12 @@ export default class PingCommand extends BaseCommand {
             name: "ping",
             category: "utils",
             description: "Check the bot ping.",
-            cooldown: 10000
+            cooldown: 10000,
+            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS"])
         })
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         let pingEmbed = new this.utils.discord.MessageEmbed({
             title: `${await this.utils.getEmoji("ping_pong")} Pinging...`,
             color: this.utils.appearance.colours.processing

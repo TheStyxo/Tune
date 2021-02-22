@@ -11,8 +11,6 @@ export default class InviteCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         //@ts-expect-error
         const invite = await ctx.client.generateInvite({ options: this.utils.settings.default_invite_permissions });
 

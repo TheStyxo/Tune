@@ -12,8 +12,6 @@ export default class InviteCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         if (ctx.args[0]) {
             if (!ctx.channel.permissionsFor(ctx.member)?.has("MANAGE_GUILD")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `You need to have the permission to manage this guild on discord in order to change the server prefix!`, true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
 

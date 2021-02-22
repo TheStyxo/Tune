@@ -3,6 +3,7 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { parser as parse } from 'discord-markdown';
 import { inspect } from 'util';
 import { VultrexHaste } from 'vultrex.haste';
+import { Permissions } from 'discord.js';
 const bin = new VultrexHaste({ url: "https://pastes.styxo.codes" });
 
 export default class InviteCommand extends BaseCommand {
@@ -12,12 +13,12 @@ export default class InviteCommand extends BaseCommand {
             aliases: ["e", "ev"],
             category: "dev",
             description: "Evaluate a code snippet.",
-            hidden: true
+            hidden: true,
+            additionalPermsRequired: new Permissions(["EMBED_LINKS"])
         })
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
         if (!this.utils.owners.find(e => e.id === ctx.member.id)) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Only the bot owners can use that command!`, true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
 
         if (ctx.args[0]) {

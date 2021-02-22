@@ -58,7 +58,6 @@ export class Cooldowns {
 }
 
 export class MessageParser {
-    static cooldowns = new discord.Collection<string, discord.Collection<string, number>>();
     static async parseCommand(ctx: MessageParserCTX): Promise<CommandCTX | null> {
         const recievedTimestamp = Date.now();
         const { prefix, commandsCollection, message } = ctx;
@@ -195,15 +194,28 @@ export class Utils {
         const emojiConfig = this.appearance.emojis as unknown as EmojisConfig
 
         if (!/^\d+$/.test(id)) id = emojiConfig[id];
-        if (!id) return null;
+        if (!id) return await this.emojiNotFound();
 
         const cache = this.emojisCache.get(id);
         if (cache) return cache;
 
         const emoji = GlobalCTX.client.emojis.cache.get(id) || await this.broadcastAndFindEmoji(id);
-        if (!emoji) return null;
+
+        if (!emoji) return await this.emojiNotFound();
 
         this.emojisCache.set(id, emoji);
+        return emoji;
+    }
+
+    public static async emojiNotFound() {
+        let emoji = this.emojisCache.get(appearance.emojis.not_found.id)!;
+        if (!emoji) {
+            // @ts-expect-error because api is private
+            const guildData = await GlobalCTX.client.api.guilds(appearance.emojis.not_found.guild).get();
+            if (!guildData) return null;
+            emoji = new discord.GuildEmoji(GlobalCTX.client, appearance.emojis.not_found, new discord.Guild(GlobalCTX.client, guildData));
+            this.emojisCache.set(appearance.emojis.not_found.id, emoji);
+        }
         return emoji;
     }
 
@@ -259,6 +271,10 @@ export class Utils {
         catch (error) {
             return altUserToDM ? this.sendDirectMessageHandler(messageToBeSent, altUserToDM) : { success: false, error };
         }
+    }
+
+    public static generateNoPermsMessage(missing: discord.PermissionString[]) {
+        return `I don't have the following permissions for the command to work properly in this channel!\n\n•\`${missing.join("\n•`")}\``;
     }
 }
 

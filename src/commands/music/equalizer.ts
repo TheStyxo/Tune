@@ -2,6 +2,7 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil, FLAG } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
 import EQMessage from '../../utils/musicUtil/EQMessage';
+import { Permissions } from 'discord.js';
 
 export default class EqualizerCommand extends BaseCommand {
     constructor() {
@@ -10,13 +11,12 @@ export default class EqualizerCommand extends BaseCommand {
             aliases: ["eq"],
             category: "music",
             description: "Change or view the eq settings.",
-            cooldown: 30000
+            cooldown: 30000,
+            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "MANAGE_MESSAGES"])
         })
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,

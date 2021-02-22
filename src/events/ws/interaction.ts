@@ -52,21 +52,25 @@ export default class SlashCommandEvent extends BaseEvent {
 
         const recievedTimestamp = Date.now();
         const channel = this.globalCTX.client.channels.resolve(interaction.channel_id) as TextChannel;
-        const guild = this.globalCTX.client.guilds.resolve(interaction.guild_id);
-        if (!guild) return;
+        if (!channel.guild) return;
 
-        const member = new GuildMember(this.globalCTX.client!, interaction.member, guild);
+        const member = new GuildMember(this.globalCTX.client!, interaction.member, channel.guild);
 
         if (await Cooldowns.check(command, member.user, channel, null)) return;
 
         const permissions = await Utils.getClientPermissionsForChannel(channel, member.user);
         if (!permissions) return;
 
+        //Check if bot has required permissions
+        if (!permissions.has("EMBED_LINKS")) return await channel.send("I don't have permissions to send message embeds in this channel!");
+        const missingPerms = command.additionalPermsRequired ? permissions.missing(command.additionalPermsRequired) : [];
+        if (missingPerms.length) return channel.send(this.utils.embedifyString(channel.guild, this.utils.generateNoPermsMessage(missingPerms), true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
+
 
         const args = interaction.data.options.map(o => o.value);
 
-        const guildData = await this.globalCTX.DB.getGuild(guild.id);
-        const guildSettings = await this.globalCTX.DB.getGuildSettings(guild.id);
+        const guildData = await this.globalCTX.DB.getGuild(channel.guild.id);
+        const guildSettings = await this.globalCTX.DB.getGuildSettings(channel.guild.id);
 
         const ctx: CommandCTX = {
             command,
@@ -74,7 +78,7 @@ export default class SlashCommandEvent extends BaseEvent {
             rawContent: args.join(" "),
             member,
             channel,
-            guild,
+            guild: channel.guild,
             client: this.globalCTX.client,
             permissions,
             recievedTimestamp,
@@ -87,7 +91,7 @@ export default class SlashCommandEvent extends BaseEvent {
             command.run(ctx);
         } catch (err) {
             this.globalCTX.logger?.error(err);
-            channel.send(Utils.embedifyString(guild, `There was an error executing that command, please try again.\nIf this error persists, please report this issue on our support server- [ririchiyo.xyz/support](${Utils.settings.info.supportServerURL})`, true));
+            channel.send(Utils.embedifyString(channel.guild, `There was an error executing that command, please try again.\nIf this error persists, please report this issue on our support server- [ririchiyo.xyz/support](${Utils.settings.info.supportServerURL})`, true));
         }
     }
 }

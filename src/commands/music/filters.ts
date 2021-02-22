@@ -16,8 +16,6 @@ export default class FiltersCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         if (ctx.args.length) {
             switch (ctx.args[0].replace(/(re)(?:(s|se|set)?)/, "reset")) {
                 case "nightcore":

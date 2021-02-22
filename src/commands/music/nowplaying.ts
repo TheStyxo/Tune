@@ -15,9 +15,6 @@ export default class NowPlayingCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,

@@ -1,6 +1,7 @@
 import BaseEvent from '../../utils/structures/BaseEvent';
 import { Client, Message } from 'discord.js';
 import { MessageParser } from '../../utils/Utils';
+import { CommandCTX } from '../../utils/structures/BaseCommand';
 
 export default class MessageEvent extends BaseEvent {
     constructor() {
@@ -24,6 +25,12 @@ export default class MessageEvent extends BaseEvent {
         if (!parsedCommand) return;
 
         parsedCommand.guildSettings = guildSettings;
+
+        //Check if bot has required permissions
+        if (!parsedCommand.permissions.has("EMBED_LINKS")) return await message.channel.send("I don't have permissions to send message embeds in this channel!");
+        const missingPerms = parsedCommand.command.additionalPermsRequired ? parsedCommand.permissions.missing(parsedCommand.command.additionalPermsRequired) : [];
+        if (missingPerms.length) return message.channel.send(this.utils.embedifyString(message.guild, this.utils.generateNoPermsMessage(missingPerms), true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
+
         try {
             parsedCommand.command.run(parsedCommand);
         } catch (err) {

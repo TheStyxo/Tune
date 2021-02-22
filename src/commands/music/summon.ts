@@ -13,11 +13,6 @@ export default class SummonCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX, opts?: Success | CustomError): Promise<Success | CustomError> {
-        if (!ctx.permissions.has("EMBED_LINKS")) {
-            await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-            return new CustomError(FLAG.NO_EMBED_PERMISSION);
-        }
-
         const res = await this.testConditions(ctx, opts);
         if (res.isError) return res;
 
