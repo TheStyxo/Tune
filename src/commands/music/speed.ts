@@ -33,7 +33,7 @@ export default class SpeedCommand extends BaseCommand {
         if (res.isError) return;
 
         const speedRequested = parseInt(ctx.args[0].replace(/%*/g, "").replace(/(re)(?:(s|se|set)?)/, "100"));
-        if (Number.isNaN(speedRequested) || speedRequested > 300 || speedRequested < 50) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 50 and 300 to set the player speed to!`, true));
+        if (Number.isNaN(speedRequested) || speedRequested > 300 || speedRequested < 50) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 50% and 300% to set the player speed to!`, true));
 
         const newTimescale = speedRequested === 100 && (!Object.keys(currentTimescale).length || !Object.values(currentTimescale).some(v => v !== 1)) ? undefined : Object.assign(currentTimescale, { speed: speedRequested / 100 });
 

@@ -33,7 +33,7 @@ export default class PitchCommand extends BaseCommand {
         if (res.isError) return;
 
         const pitchRequested = parseInt(ctx.args[0].replace(/%*/g, "").replace(/(re)(?:(s|se|set)?)/, "100"));
-        if (Number.isNaN(pitchRequested) || pitchRequested > 300 || pitchRequested < 50) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 50 and 300 to set the player pitch to!`, true));
+        if (Number.isNaN(pitchRequested) || pitchRequested > 300 || pitchRequested < 50) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 50% and 300% to set the player pitch to!`, true));
 
         const newTimescale = pitchRequested === 100 && (!Object.keys(currentTimescale).length || !Object.values(currentTimescale).some(v => v !== 1)) ? undefined : Object.assign(currentTimescale, { pitch: pitchRequested / 100 });
 

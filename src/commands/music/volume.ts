@@ -30,10 +30,10 @@ export default class VolumeCommand extends BaseCommand {
         if (res.isError) return;
 
         const volumeRequested = parseInt(ctx.args[0].replace(/%*/g, "").replace(/(re)(?:(s|se|set)?)/, "100"));
-        if (Number.isNaN(volumeRequested)) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 0 and ${ctx.guildSettings.music.volume.limit} to set the volume to!`, true));
+        if (Number.isNaN(volumeRequested)) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `Please provide a numeric value between 0% and ${ctx.guildSettings.music.volume.limit}% to set the volume to!`, true));
 
         if (volumeRequested > ctx.guildSettings.music.volume.limit) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The volume limit is enabled on this server, the volume cannot be set to a value above ${ctx.guildSettings.music.volume.limit}%`, true));
-        else if (volumeRequested > 1000) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between 0 and 1000 to set the volume to!", true));
+        else if (volumeRequested > 1000) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a numeric value between 0% and 1000% to set the volume to!", true));
 
         player?.setVolume(volumeRequested);
         if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.volume.setPercentage(volumeRequested);
