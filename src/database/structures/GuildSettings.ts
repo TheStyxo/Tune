@@ -66,7 +66,7 @@ export class GuildPermissions {
     }
 
     getAll(): Collection<string, GuildPermission> {
-        for (const id in this.GuildSettings._data.settings.permissions.users) this.getFor(id);
+        for (const id in this.GuildSettings._data.settings.permissions[this.isUser ? "users" : "roles"]) this.getFor(id);
         return this._cache;
     }
 
