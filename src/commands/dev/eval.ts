@@ -3,7 +3,6 @@ import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { parser as parse } from 'discord-markdown';
 import { inspect } from 'util';
 import { VultrexHaste } from 'vultrex.haste';
-import { Permissions } from 'discord.js';
 const bin = new VultrexHaste({ url: "https://pastes.styxo.codes" });
 
 export default class InviteCommand extends BaseCommand {
@@ -14,7 +13,6 @@ export default class InviteCommand extends BaseCommand {
             category: "dev",
             description: "Evaluate a code snippet.",
             hidden: true,
-            additionalPermsRequired: new Permissions(["EMBED_LINKS"])
         })
     }
 
