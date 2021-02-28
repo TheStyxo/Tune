@@ -6,7 +6,7 @@
   "main": "src/main/ShardingManager.js",
   "scripts": {
     "start": "cd dist && node .",
-    "build": "rmdir dist /S /Q && mkdir dist && tsc && cd dist && mkdir logs && cd ..\\build_files && xcopy *.bat ..\\dist",
+    "build": "npm i --include=dev && rmdir dist /S /Q && mkdir dist && tsc && cd dist && mkdir logs && cd ..\\build_files && xcopy *.bat ..\\dist",
     "test": "npm run-script build && npm start"
   },
   "author": "Paras Deshpande",
