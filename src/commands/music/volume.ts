@@ -16,7 +16,7 @@ export default class VolumeCommand extends BaseCommand {
         let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
 
         if (!ctx.args.length) {
-            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current volume is set to ${player?.volume || ctx.guildSettings.music.volume.percentage}%`));
+            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current volume is set to ${(player?.volume || ctx.guildSettings.music.volume.percentage).toFixed(0)}%`));
         }
 
         const res = MusicUtil.canModifyPlayer({

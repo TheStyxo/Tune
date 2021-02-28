@@ -6,7 +6,7 @@
   "main": "src/main/ShardingManager.js",
   "scripts": {
     "start": "cd dist && node .",
-    "build": "rmdir dist /S /Q && mkdir dist && tsc && cd dist && mkdir logs && cd ../ && xcopy *.bat dist",
+    "build": "rmdir dist /S /Q && mkdir dist && tsc && cd dist && mkdir logs && cd ..\\build_files && xcopy *.bat ..\\dist",
     "test": "npm run-script build && npm start"
   },
   "author": "Paras Deshpande",
@@ -24,6 +24,7 @@
     "source-map-support": "^0.5.19",
     "string-progressbar": "^1.0.3",
     "tune-lavalink-client": "^1.1.5",
+    "tune-spotify-plugin": "^0.0.1",
     "uuid": "^8.3.2",
     "vultrex.haste": "^1.0.1"
   },

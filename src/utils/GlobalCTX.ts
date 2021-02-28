@@ -3,6 +3,7 @@ import { Logger } from '../utils/Utils';
 import DB from '../database/DB';
 import { Client, Collection, GuildEmoji } from 'discord.js';
 import { Manager } from 'tune-lavalink-client';
+import Spotify from 'tune-spotify-plugin';
 import credentials from '../../config/credentials.json';
 import PlayingMessageManager from './musicUtil/PlayingMessageManager';
 
@@ -22,7 +23,7 @@ export const GlobalCTX = new class GlobalCTX {
         this.customEmojiCache = new Collection();
         this.lavalinkClient = new Manager({
             client: this.client,
-            plugins: [],
+            plugins: [new Spotify({ clientSecret: credentials.spotify.client_secret, clientID: credentials.spotify.client_id })],
             nodes: credentials.lavalink.nodes,
             autoPlay: true,
             send
