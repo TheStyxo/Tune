@@ -33,27 +33,62 @@ export default class PermissionsCommand extends BaseCommand {
 
             if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a role or user id to view permissions for!", true));
             const found = await findRoleOrUser(ctx.guild, parsedInput.id);
-            if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
 
-            const roleOrUserPermissionData = ctx.guildSettings.permissions[(found as unknown as GuildMember).user ? `users` : `roles`].getFor(found.id);
+            const roleOrUserPermissionData = found ? ctx.guildSettings.permissions[(found as unknown as GuildMember).user ? `users` : `roles`].getFor(found.id) : null;
 
             switch (parsedInput.option) {
                 default:
+                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
                     return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Permissions for ${found}\n\n${displayPermissions(ctx.guildSettings.permissions[(found as unknown as GuildMember).user ? `users` : `roles`].getFor(found.id), found)} `));
                 case 'allow':
                 case 'add':
                 case 'give':
                     if (!ctx.channel.permissionsFor(ctx.member)?.has("ADMINISTRATOR")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "You need to have administrator permission on this server to modify permissions!", true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
-                    roleOrUserPermissionData.allow(parsedInput.requestedPerms.bitfield);
+                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    await roleOrUserPermissionData!.allow(parsedInput.requestedPerms.bitfield);
                     return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Allowed the following permissions to ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
                 case 'deny':
                 case 'remove':
                 case 'rem':
                 case 'take':
                     if (!ctx.channel.permissionsFor(ctx.member)?.has("ADMINISTRATOR")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "You need to have administrator permission on this server to modify permissions!", true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
-                    roleOrUserPermissionData.deny(parsedInput.requestedPerms.bitfield);
+                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    await roleOrUserPermissionData!.deny(parsedInput.requestedPerms.bitfield);
                     return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Denied the following permissions to ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
                 //Add a way to reset permissions
+                case 'reset':
+                case 'res':
+                    if (!ctx.channel.permissionsFor(ctx.member)?.has("ADMINISTRATOR")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "You need to have administrator permission on this server to modify permissions!", true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
+                    if (parsedInput.requestedPerms.bitfield === 0 && !parsedInput.id) {
+                        switch (parsedInput.forRolesOrUsers) {
+                            default:
+                                await ctx.guildSettings.permissions.roles.reset();
+                                await ctx.guildSettings.permissions.users.reset();
+                                return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Successfully reset all permissions for this server!`));
+                            case 'r':
+                            case 'role':
+                            case 'roles':
+                                await ctx.guildSettings.permissions.roles.reset();
+                                return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Successfully reset permissions for all roles on this server!`));
+                            case 'u':
+                            case 'user':
+                            case 'users':
+                                await ctx.guildSettings.permissions.users.reset();
+                                return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Successfully reset permissions for all users on this server!`));
+                        }
+                    }
+
+                    if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a user or role id to reset the permissions for!", true));
+                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+
+                    if (parsedInput.requestedPerms.bitfield === 0) {
+                        await roleOrUserPermissionData!.reset();
+                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset all permissions to default for ${found}`));
+                    }
+                    else {
+                        await roleOrUserPermissionData!.reset(parsedInput.requestedPerms.bitfield);
+                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset the following permissions for ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
+                    }
             }
         }
     }
