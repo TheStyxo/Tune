@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #9ea5af;
+      }
+
+      .cls-2 {
+        fill: #747f8d;
+      }
+    </style>
+  </defs>
+  <circle id="OuterCircle" class="cls-1" cx="64" cy="64" r="40.031"/>
+  <circle id="InnerCircle" class="cls-2" cx="64" cy="64" r="24.906"/>
+</svg>

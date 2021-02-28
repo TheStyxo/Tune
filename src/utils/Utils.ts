@@ -13,6 +13,19 @@ import GuildData from "../database/structures/Guild";
 import GuildSettings from "../database/structures/GuildSettings";
 import { Client } from "discord.js";
 
+const not_found_emoji = {
+    "animated": false,
+    "name": "404",
+    "id": "813250808522604544",
+    "deleted": false,
+    "guild": "797853042569248808",
+    "requireColons": null,
+    "managed": false,
+    "available": true,
+    "requiresColons": true,
+    "author": null,
+    "require_colons": true
+}
 
 export type Commands = discord.Collection<BaseCommand["name"], BaseCommand>;
 
@@ -208,13 +221,13 @@ export class Utils {
     }
 
     public static async emojiNotFound() {
-        let emoji = this.emojisCache.get(appearance.emojis.not_found.id)!;
+        let emoji = this.emojisCache.get(not_found_emoji.id)!;
         if (!emoji) {
             // @ts-expect-error because api is private
-            const guildData = await GlobalCTX.client.api.guilds(appearance.emojis.not_found.guild).get();
+            const guildData = await GlobalCTX.client.api.guilds(not_found_emoji.guild).get();
             if (!guildData) return null;
-            emoji = new discord.GuildEmoji(GlobalCTX.client, appearance.emojis.not_found, new discord.Guild(GlobalCTX.client, guildData));
-            this.emojisCache.set(appearance.emojis.not_found.id, emoji);
+            emoji = new discord.GuildEmoji(GlobalCTX.client, not_found_emoji, new discord.Guild(GlobalCTX.client, guildData));
+            this.emojisCache.set(not_found_emoji.id, emoji);
         }
         return emoji;
     }

@@ -15,7 +15,7 @@ export default class PingCommand extends BaseCommand {
     async run(ctx: CommandCTX) {
         let pingEmbed = new this.utils.discord.MessageEmbed({
             title: `${await this.utils.getEmoji("ping_pong")} Pinging...`,
-            color: this.utils.appearance.colours.processing
+            color: this.utils.appearance.colours.loading
         })
 
         const pingMessage = await ctx.channel.send(pingEmbed).catch((err: Error) => this.globalCTX.logger?.error(err.message));
