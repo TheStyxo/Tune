@@ -24,6 +24,7 @@
     "source-map-support": "^0.5.19",
     "string-progressbar": "^1.0.3",
     "tune-lavalink-client": "^1.1.5",
+    "tune-spotify-plugin": "^0.0.1",
     "uuid": "^8.3.2",
     "vultrex.haste": "^1.0.1"
   },
