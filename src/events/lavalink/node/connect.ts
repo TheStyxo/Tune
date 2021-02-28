@@ -1,4 +1,4 @@
-import { Manager, Node } from '6ec0bd7f/dist';
+import { Manager, Node } from 'tune-lavalink-client';
 import BaseEvent from '../../../utils/structures/BaseEvent';
 
 export class NodeConnectEvent extends BaseEvent {

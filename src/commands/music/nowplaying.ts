@@ -1,7 +1,7 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
-import { Player, Track } from '6ec0bd7f/dist';
+import { Player, Track } from 'tune-lavalink-client';
 import createBar from 'string-progressbar';
 
 export default class NowPlayingCommand extends BaseCommand {
@@ -15,9 +15,6 @@ export default class NowPlayingCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,

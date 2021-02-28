@@ -8,10 +8,24 @@ import chalk, { Chalk } from 'chalk';
 import { BaseCommand, CommandCTX } from './structures/BaseCommand';
 import GlobalCTX from "./GlobalCTX";
 import InternalPermissions, { InternalPermissionResolvable } from "../database/utils/InternalPermissions";
-import { Player } from "6ec0bd7f/dist";
+import { Player } from "tune-lavalink-client";
 import GuildData from "../database/structures/Guild";
 import GuildSettings from "../database/structures/GuildSettings";
 import { Client } from "discord.js";
+
+const not_found_emoji = {
+    "animated": false,
+    "name": "404",
+    "id": "813250808522604544",
+    "deleted": false,
+    "guild": "797853042569248808",
+    "requireColons": null,
+    "managed": false,
+    "available": true,
+    "requiresColons": true,
+    "author": null,
+    "require_colons": true
+}
 
 export type Commands = discord.Collection<BaseCommand["name"], BaseCommand>;
 
@@ -57,7 +71,6 @@ export class Cooldowns {
 }
 
 export class MessageParser {
-    static cooldowns = new discord.Collection<string, discord.Collection<string, number>>();
     static async parseCommand(ctx: MessageParserCTX): Promise<CommandCTX | null> {
         const recievedTimestamp = Date.now();
         const { prefix, commandsCollection, message } = ctx;
@@ -73,7 +86,7 @@ export class MessageParser {
 
         if (!usedPrefix) return null;
 
-        const args = message.content.slice(usedPrefix.length).trim().split(/\s+/);
+        const args = message.content.trim().slice(usedPrefix.length).trim().split(/\s+/);
         const commandName = args.shift()?.toLowerCase();
 
         if (!commandName) return null;
@@ -82,7 +95,8 @@ export class MessageParser {
         if (!command) return null;
 
         const channel = message.channel as discord.TextChannel;
-        const permissions = channel.permissionsFor(message.client.user) || new discord.Permissions(0);
+        const permissions = await Utils.getClientPermissionsForChannel(channel, message.author);
+        if (!permissions) return null;
 
         //Handle cooldown
         if (await Cooldowns.check(command, message.author, message.channel as unknown as discord.TextChannel, message)) return null;
@@ -93,7 +107,7 @@ export class MessageParser {
         }
 
 
-        return { command, args, member: message.member as discord.GuildMember, channel, client: message.client, permissions, recievedTimestamp, guild: message.guild, guildData: ctx.guildData, guildSettings: ctx.guildSettings }
+        return { command, args, rawContent: message.content.trim().slice(usedPrefix.length).trim().slice(commandName.length).trim(), member: message.member as discord.GuildMember, channel, client: message.client, permissions, recievedTimestamp, guild: message.guild, guildData: ctx.guildData, guildSettings: ctx.guildSettings, isInteraction: false }
     }
 }
 
@@ -123,19 +137,19 @@ export class Utils {
 
     /**
      * Convert any text to a simple embed with the text as it's description.
-     * @param guild [Required] A discord "Guild"
+     * @param guild A discord "Guild" or null
      * @param text [Required] Any text to include in the embed description
      * @param isError [false] If the error colour should be used as embed colour from 'appearance.error.colour'
      * @param embedColour [optional] The colour of the embed
      */
-    public static embedifyString(guild: discord.Guild, text: string, isError: boolean = false, embedColour?: string): discord.MessageEmbed {
-        if (!(guild instanceof discord.Guild)) throw new TypeError("The provided value for 'guild' is not a discord 'Guild'");
+    public static embedifyString(guild: discord.Guild | null, text: string, isError: boolean = false, embedColour?: string): discord.MessageEmbed {
+        if (guild !== null && !(guild instanceof discord.Guild)) throw new TypeError("The provided value for 'guild' is not a discord 'Guild'");
         if (typeof text !== 'string') throw new TypeError("The provided value for 'text' is not a 'String'");
         if (typeof isError !== 'boolean') throw new TypeError("The provided value for 'isError' is not a 'Boolean'");
         if (typeof embedColour !== 'undefined' && typeof embedColour !== 'string') throw new TypeError("The provided value for 'embedColour' is not a 'String'");
 
         if (!embedColour && guild) embedColour = isError ? appearance.colours.error : this.getClientColour(guild);
-        return new discord.MessageEmbed({ color: embedColour, description: text });
+        return new discord.MessageEmbed({ color: embedColour || appearance.colours.general, description: text });
     }
 
     /**
@@ -193,15 +207,28 @@ export class Utils {
         const emojiConfig = this.appearance.emojis as unknown as EmojisConfig
 
         if (!/^\d+$/.test(id)) id = emojiConfig[id];
-        if (!id) return null;
+        if (!id) return await this.emojiNotFound();
 
         const cache = this.emojisCache.get(id);
         if (cache) return cache;
 
         const emoji = GlobalCTX.client.emojis.cache.get(id) || await this.broadcastAndFindEmoji(id);
-        if (!emoji) return null;
+
+        if (!emoji) return await this.emojiNotFound();
 
         this.emojisCache.set(id, emoji);
+        return emoji;
+    }
+
+    public static async emojiNotFound() {
+        let emoji = this.emojisCache.get(not_found_emoji.id)!;
+        if (!emoji) {
+            // @ts-expect-error because api is private
+            const guildData = await GlobalCTX.client.api.guilds(not_found_emoji.guild).get();
+            if (!guildData) return null;
+            emoji = new discord.GuildEmoji(GlobalCTX.client, not_found_emoji, new discord.Guild(GlobalCTX.client, guildData));
+            this.emojisCache.set(not_found_emoji.id, emoji);
+        }
         return emoji;
     }
 
@@ -239,6 +266,28 @@ export class Utils {
         const guild = new discord.Guild(GlobalCTX.client, guildData);
 
         return new discord.GuildEmoji(GlobalCTX.client, emojiData, guild);
+    }
+
+    public static async getClientPermissionsForChannel(channel: discord.TextChannel, userToDM?: discord.User) {
+        if (!userToDM) userToDM = channel.guild.owner?.user;
+        const permissions = channel.permissionsFor(channel.client.user!);
+        if (permissions?.has("SEND_MESSAGES")) return permissions;
+        const invite = permissions?.has("CREATE_INSTANT_INVITE") ? await (await channel.createInvite({ maxAge: 0, reason: "Error occured in channel!" })).toString() : null;
+        if (userToDM) await this.sendDirectMessageHandler(this.embedifyString(null, `I dont have permissions to send messages${invite ? "" : " and create invites"} on ${invite ? `**[${channel.guild.name}](${invite})**` : `\`${channel.guild.name}\``} in ${invite ? `**[#${channel.name}](${invite})**` : `\`#${channel.name}\``}`), userToDM, channel.guild.owner?.user);
+    }
+
+    public static async sendDirectMessageHandler(messageToBeSent: any, userToDM: discord.User, altUserToDM?: discord.User): Promise<{ success: boolean, obj?: discord.Message, error?: Error }> {
+        try {
+            const obj = await userToDM.send(messageToBeSent);
+            return { success: true, obj: obj };
+        }
+        catch (error) {
+            return altUserToDM ? this.sendDirectMessageHandler(messageToBeSent, altUserToDM) : { success: false, error };
+        }
+    }
+
+    public static generateNoPermsMessage(missing: discord.PermissionString[]) {
+        return `I don't have the following permissions for the command to work properly in this channel!\n\n•\`${missing.join("\n•`")}\``;
     }
 }
 

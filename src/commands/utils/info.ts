@@ -1,5 +1,5 @@
-import GlobalCTX from '../../utils/GlobalCTX';
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
+import { Permissions } from 'discord.js';
 import time from 'ms';
 
 export default class InfoCommand extends BaseCommand {
@@ -8,7 +8,8 @@ export default class InfoCommand extends BaseCommand {
             name: "info",
             aliases: ["i"],
             category: "utils",
-            description: "Get some info about the bot."
+            description: "Get some info about the bot.",
+            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS"])
         })
     }
 
@@ -32,7 +33,7 @@ export default class InfoCommand extends BaseCommand {
                 { name: "Library", value: this.utils.settings.info.library, inline: true },
                 { name: "Made by", value: `${owner.username} [${await this.utils.getEmoji("animated_panda_happy")}](${owner.profileURL})`, inline: true },
                 { name: "Guilds", value: totalGuilds, inline: true },
-                { name: "Commands", value: GlobalCTX.commands.size, inline: true },
+                { name: "Commands", value: this.globalCTX.commands.size, inline: true },
                 { name: "Invite", value: `**[Invite](${invite})**`, inline: true }
             ],
             footer: {
@@ -41,6 +42,6 @@ export default class InfoCommand extends BaseCommand {
             color: this.utils.getClientColour(ctx.guild)
         })
 
-        await ctx.channel.send(infoEmbed).catch((err: Error) => GlobalCTX.logger?.error(err.message));
+        await ctx.channel.send(infoEmbed).catch((err: Error) => this.globalCTX.logger?.error(err.message));
     }
 }

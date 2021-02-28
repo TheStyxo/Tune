@@ -1,5 +1,6 @@
 import IGuildPermissionsData from './GuildPermissionsData';
 import default_guild_settings from '../../../config/defaults/default_guild_settings.json';
+import { Filters } from 'tune-lavalink-client';
 
 export const DefaultGuildSettingsData = {
     "_id": undefined,
@@ -12,9 +13,6 @@ export const DefaultGuildSettingsData = {
         "music": {
             "24_7": false,
             "loop": "DISABLED" as ILoop,
-            "eq": {
-                "bands": Array(15).fill(0)
-            },
             "volume": {
                 "percentage": 100,
                 "limit": 100
@@ -39,16 +37,11 @@ export interface IGuildSettingsData {
         music: {
             "24_7": boolean,
             loop: ILoop,
-            eq: {
-                bands: number[]
-            },
             volume: {
                 percentage: number,
                 limit: number
             },
-            filters: {
-                [key: string]: object
-            }
+            filters: Filters
         }
     }
 }

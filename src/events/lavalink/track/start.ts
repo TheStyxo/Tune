@@ -1,4 +1,4 @@
-import { Player, Manager, Track } from '6ec0bd7f/dist';
+import { Player, Manager, Track } from 'tune-lavalink-client';
 import BaseEvent from '../../../utils/structures/BaseEvent';
 
 export class TrackStartEvent extends BaseEvent {

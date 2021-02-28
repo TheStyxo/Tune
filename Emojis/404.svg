@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 446.64px;
+        fill: #ccd6dd;
+        text-anchor: middle;
+        font-family: "Bebas Neue";
+      }
+    </style>
+  </defs>
+  <image id="disconnect" x="1" y="1" width="126" height="126" xlink:href="data:img/png;base64,iVBORw0KGgoAAAANSUhEUgAAAH4AAAB+CAYAAADiI6WIAAAESUlEQVR4nO3dvUocURjG8Wc34hIFYSUQSGuhLNh5A6mTdLkIWy1SWlim0CpglSuwS1LnBrYzGWy2DeTLBcGAstkNR3digu7OOTPn4515n3+9LGfnxyDOnI8WBNbPBosAehLHVqJsq7d2JW1Q4uCn6McAXggYjo/eAXgpDV8UfAPR88Thi4FvMHqeKHwR8ArQ88TgJ4dXhJ4nAj8pvEL0vOT4yeAVo+clxU8C74LePhtmywdHXUzijK1yLeBid3s4Xu3aPIdIhh8d3hV9ZWdvo3V51Y4zOj9NOovj88P9U8n4UeE1oOdJx48Grwk9TzJ+FHiN6HlS8YPDa0bPk4gfFJ7ot0nDD3aRndC//fjUZHST+W3mN7a///xs8XFzzY6n1zDMeEJ8qQv6gy9fT1Ze7W9iNAoxFHktLOD89d7J7yePNy3GFuzO9w5PdIsE4HuFJ7pDifG9wRO9RAnxvcATvUKJ8CvDE91DCfArwRPdY5HxS8MTPUAR8UvBEz1gkfCd4YkeoQj4TvBEj1hgfGt4oicoIL4VPNETFgi/8G1YPxt0iJ6w0QjmmpprazGI/K1ep+iDc+/4fjZYAvAewNOiLyJ64Nzu/I8Anm/11n7N+sBMeKILzCP+vfBEF5wn/DvwRK9BHvD/gyd6jaqI/xee6DWsAv41PNFrXEn8Vj8bPATwgeg1zh3/mXmAs070muf2kMdYr1vNYyd6DXLDL35kS/Qa5YBfCL/05u0joteo0ejGrKDGLlli8yO80givNMIrjfBKI7zSCK80wiuN8EojvNIIrzTCK43wSiO80givNMIrjfBKI7zSCK80wiuN8EojvNIIrzTCK43wSiO80givNMIrjfBKI7zSCK80wiuN8EojvNIIrzTCK43wSiO80givNMIrjfBKI7zSiuG9nDDPomZhVgh/sbs9nHQWx5SrR8bKmBUNthB+vNrtnR/unxJffsbIWBmzosFa/Y0nvvxc0DGFz6Znks6N+HJzRDfWWX4YkfWhwe2zYbays7fRurzifwQCKoF+fejwv8ePEb9mlUXHPQcOEr8mVUHHjCNGiS+8quiYc6gw8YXmAx0Fx4gTX1i+0FH0cI/4cvKJDpunusRPn2902L6CIX66QqDD5d0b8eMXCh2uL12JH6+Q6Cjztp344QuNjrLTLIgfrhjoqDK/hvj+i4WOqhOriO+vmOjwMaOO+NWLjQ5fUymJX74U6PA5h5b47qVCh+/J08S3LyU6QsyaJ35xqdERarkE8WcnAR0h18kQ/25S0BF6gRTxb5OEjhgr44gvDx2xlkRqxpeIjphrYTXiS0VH7EXQmvAloyPF6ncN+NLRkWrbA1f85YOjLiZxxla51s2eApLRkXK/Cxf8hpYMHak3OlGMnxQdEna4UYifHB1StjZShC8CHZL2tFKALwYd0jYzazC+KHRI3MWugfji0CF1+8IpvtXuTTUok4YOAH8AOaqwqf3JGaUAAAAASUVORK5CYII="/>
+  <text id="_404" data-name="404" class="cls-1" transform="translate(64 88.127) scale(0.166)"><tspan x="0">404</tspan></text>
+</svg>

@@ -12,17 +12,21 @@ export class BaseCommand {
     description: string;
     cooldown: number;
     hidden: boolean;
+    allowInteraction: boolean;
+    additionalPermsRequired?: Permissions;
     globalCTX = GlobalCTX;
     utils = Utils;
 
     constructor(options?: CommandProps) {
-        const { name, aliases, category, description, cooldown, hidden } = check(options);
+        const { name, aliases, category, description, cooldown, hidden, allowInteraction, additionalPermsRequired } = check(options);
         this.name = name;
         this.aliases = aliases;
         this.category = category;
         this.description = description;
         this.cooldown = cooldown || 1000;
         this.hidden = hidden || false;
+        this.allowInteraction = allowInteraction === undefined ? true : allowInteraction;
+        this.additionalPermsRequired = additionalPermsRequired;
         this.globalCTX = GlobalCTX;
     }
     async run(ctx: CommandCTX, opts?: any): Promise<any> { };
@@ -36,6 +40,8 @@ export interface CommandProps {
     description: string;
     cooldown?: number;
     hidden?: boolean;
+    allowInteraction?: boolean;
+    additionalPermsRequired?: Permissions;
 }
 
 function check(options?: CommandProps): CommandProps {
@@ -56,11 +62,16 @@ function check(options?: CommandProps): CommandProps {
 
     if (typeof options.hidden !== 'undefined' && typeof options.hidden !== 'boolean') throw new TypeError("Command option 'hidden' must be of type 'boolean'.");
 
+    if (typeof options.allowInteraction !== 'undefined' && typeof options.allowInteraction !== 'boolean') throw new TypeError("Command option 'allowInteraction' must be of type 'boolean'.");
+
+    if (typeof options.additionalPermsRequired !== 'undefined' && !(options.additionalPermsRequired instanceof Permissions)) throw new TypeError("Command option 'additionalPermsRequired' must be of type 'Discord.Permission'.");
+
     return options;
 }
 
 export interface CommandCTX {
     command: BaseCommand,
+    rawContent: string,
     args: string[],
     member: GuildMember,
     channel: TextChannel,
@@ -70,7 +81,9 @@ export interface CommandCTX {
     //userData: UserData,
     client: Client,
     permissions: Readonly<Permissions>,
-    recievedTimestamp: number
+    recievedTimestamp: number,
+    isInteraction?: boolean,
+    additionalPermsRequired?: Permissions
 }
 
 export default BaseCommand;

@@ -1,5 +1,5 @@
 import { Utils } from '../Utils';
-import { Player } from '6ec0bd7f/dist';
+import { Player } from 'tune-lavalink-client';
 import { GuildMember, Message, MessageReaction, ReactionCollector, TextChannel, User } from 'discord.js';
 import GlobalCTX from '../GlobalCTX';
 import GuildSettings from "../../database/structures/GuildSettings";
@@ -36,7 +36,7 @@ export default class EQMessage {
         return GlobalCTX.lavalinkClient.players.get(this.channel.guild.id);
     }
     get bands() {
-        return (this.player?.bands || this.guildSettings?.music.eq.bands) ?? (Array(15).fill(0) as number[]);
+        return (this.player?.bands || this.guildSettings?.music.filters.equalizer?.map(v => v.gain)) ?? (Array(15).fill(0) as number[]);
     }
 
     async send() {
@@ -58,7 +58,8 @@ export default class EQMessage {
                 Utils.appearance.emojis.arrow_left,
                 Utils.appearance.emojis.arrow_up,
                 Utils.appearance.emojis.arrow_down,
-                Utils.appearance.emojis.arrow_right
+                Utils.appearance.emojis.arrow_right,
+                Utils.appearance.emojis.reset
             ];
 
             /**
@@ -95,7 +96,7 @@ export default class EQMessage {
                                 const newBand = { band: this.cursor - 1, gain: changedBandGain };
 
                                 if (this.player) this.player.setEQ(newBand);
-                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.setEQ(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }
@@ -111,7 +112,7 @@ export default class EQMessage {
                                 const newBand = { band: this.cursor - 1, gain: changedBandGain };
 
                                 if (this.player) this.player.setEQ(newBand);
-                                if (this.modifyDB) await this.guildSettings?.music.eq.setBands(newBand);
+                                if (this.modifyDB) await this.guildSettings?.music.setEQ(newBand);
 
                                 await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                             }
@@ -120,6 +121,12 @@ export default class EQMessage {
 
                     case Utils.appearance.emojis.arrow_right:
                         if (this.cursor + 1 <= 15) this.cursor += 1;
+                        await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
+                        break;
+                    case Utils.appearance.emojis.reset:
+                        if (this.player) this.player.clearEQ();
+                        if (this.modifyDB) await this.guildSettings?.music.clearEQ();
+
                         await this.message?.edit(convertBandsToGraph(this.bands, this.cursor), { code: true });
                         break;
                 }

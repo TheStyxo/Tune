@@ -183,5 +183,6 @@ npm test
 ## Contributors
 👤 [**TheStyxo**](https://styxo.codes)
 
-- Contributor
+- Author
+- Website - https://styxo.codes/
 - Github: [@TheStyxo](https://github.com/TheStyxo)

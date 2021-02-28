@@ -4,6 +4,7 @@ import createInstance from '../utils/createInstance';
 import merge from 'deepmerge';
 import { Collection } from 'discord.js';
 import GuildPermission from '../utils/GuildPermission';
+import { Filters } from 'tune-lavalink-client';
 
 export default class GuildSettings {
     // Class props //
@@ -65,7 +66,7 @@ export class GuildPermissions {
     }
 
     getAll(): Collection<string, GuildPermission> {
-        for (const id in this.GuildSettings._data.settings.permissions.users) this.getFor(id);
+        for (const id in this.GuildSettings._data.settings.permissions[this.isUser ? "users" : "roles"]) this.getFor(id);
         return this._cache;
     }
 
@@ -89,13 +90,11 @@ export class GuildPermissions {
 export class GuildMusicSettings {
     // Class props //
     GuildSettings: GuildSettings;
-    eq: EQSettings;
     volume: GuildVolumeSettings;
     // Class props //
 
     constructor(GuildSettings: GuildSettings) {
         this.GuildSettings = GuildSettings;
-        this.eq = new EQSettings(this.GuildSettings);
         this.volume = new GuildVolumeSettings(this.GuildSettings);
     }
 
@@ -127,32 +126,100 @@ export class GuildMusicSettings {
         await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.loop": value } }, { upsert: true });
         return this.GuildSettings._data.settings.music.loop = value;
     }
-}
 
-class EQSettings {
-    // Class props //
-    GuildSettings: GuildSettings;
-    // Class props //
-
-    constructor(GuildSettings: GuildSettings) {
-        this.GuildSettings = GuildSettings;
+    get filters(): Filters {
+        return this.GuildSettings._data.settings.music.filters;
     }
 
-    get bands(): number[] {
-        return this.GuildSettings._data.settings.music.eq.bands;
+    /**
+    * Sets the timescale filter.
+    * @param {Filters["timescale"]} options Timescale options
+    */
+    async setTimescale({ speed, pitch, rate }: Filters["timescale"] = {}): Promise<this> {
+        if (!speed && !pitch && !rate) {
+            delete this.GuildSettings._data.settings.music.filters.timescale;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.timescale": null } }, { upsert: true });
+        }
+        else {
+            this.GuildSettings._data.settings.music.filters.timescale = {
+                "speed": speed || 1,
+                "pitch": pitch || 1,
+                "rate": rate || 1
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.timescale": this.GuildSettings._data.settings.music.filters.timescale } }, { upsert: true });
+        }
+        return this;
     }
 
-    async setBands(...bands: EqualizerBand[]): Promise<this> {
+    /**
+    * Sets the tremolo filter.
+    * @param {Filters["tremolo"]} options Tremolo options
+    */
+    async setTremolo({ frequency, depth }: Filters["tremolo"] = {}): Promise<this> {
+        if (!depth || !frequency) {
+            delete this.GuildSettings._data.settings.music.filters.tremolo;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.tremolo": null } }, { upsert: true });
+        }
+        else {
+            if (depth > 1 || depth < 0) throw new RangeError("The depth must be between 0 and 1");
+            if (frequency > 0) throw new RangeError("The frequency must be grater than 0");
+            this.GuildSettings._data.settings.music.filters.tremolo = {
+                "frequency": frequency,
+                "depth": depth
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.tremolo": this.GuildSettings._data.settings.music.filters.tremolo } }, { upsert: true });
+        }
+        return this;
+    }
+
+    /**
+    * Sets the rotation filter.
+    * @param {Filters["rotation"]} options Rotation options
+    */
+    async setRotation({ rotationHz }: Filters["rotation"] = {}): Promise<this> {
+        if (!rotationHz) {
+            delete this.GuildSettings._data.settings.music.filters.rotation;
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.rotation": null } }, { upsert: true });
+        }
+        else {
+            if (rotationHz > 0) throw new RangeError("The rotationHz must be grater than 0");
+            this.GuildSettings._data.settings.music.filters.rotation = {
+                "rotationHz": rotationHz || 0
+            };
+            await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.rotation": this.GuildSettings._data.settings.music.filters.rotation } }, { upsert: true });
+        }
+        return this;
+    }
+
+    /**
+    * Sets the equalizer filter.
+    * @param {Filters["rotation"]} options Rotation options
+    */
+    async setEQ(...bands: EqualizerBand[]): Promise<this> {
         // Hacky support for providing an array
         if (Array.isArray(bands[0])) bands = bands[0] as unknown as EqualizerBand[]
 
         if (!bands.length || !bands.every((band) => JSON.stringify(Object.keys(band).sort()) === '["band","gain"]'))
             throw new TypeError("Bands must be a non-empty object array containing 'band' and 'gain' properties.");
 
-        for (const { band, gain } of bands) this.GuildSettings._data.settings.music.eq.bands[band] = gain;
+        if (!this.GuildSettings._data.settings.music.filters.equalizer) this.GuildSettings._data.settings.music.filters.equalizer = Array(15).fill(null).map((v, i) => ({ band: i, gain: 0 }));
 
-        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.eq.bands": this.GuildSettings._data.settings.music.eq.bands } });
+        for (const { band, gain } of bands) this.GuildSettings._data.settings.music.filters.equalizer[band] = { band, gain };
 
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters.equalizer": this.GuildSettings._data.settings.music.filters.equalizer } });
+
+        return this;
+    }
+
+    async clearEQ() {
+        delete this.GuildSettings._data.settings.music.filters.equalizer;
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.equalizer": null } });
+    }
+
+    /** Reset all audio filters except eq */
+    async setFilters(filters: Filters): Promise<this> {
+        this.GuildSettings._data.settings.music.filters = filters;
+        await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $set: { "settings.music.filters": this.GuildSettings._data.settings.music.filters } }, { upsert: true });
         return this;
     }
 }

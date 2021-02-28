@@ -1,4 +1,4 @@
-import { Player, Manager } from '6ec0bd7f/dist';
+import { Player, Manager } from 'tune-lavalink-client';
 import BaseEvent from '../../../utils/structures/BaseEvent';
 
 export class PlayerMoveEvent extends BaseEvent {

@@ -13,8 +13,6 @@ export default class PlayCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
 
         if (!ctx.args.length) {

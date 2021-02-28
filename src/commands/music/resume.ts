@@ -8,13 +8,11 @@ export default class ResumeCommand extends BaseCommand {
             name: "resume",
             aliases: ["res"],
             category: "music",
-            description: "Resumes the player."
+            description: "Resume the player."
         })
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,

@@ -1,7 +1,6 @@
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { MusicUtil, CustomError, Success, FLAG } from '../../utils/Utils';
 import InternalPermissions from '../../database/utils/InternalPermissions';
-import { VoiceChannel } from 'discord.js';
 
 export default class SummonCommand extends BaseCommand {
     constructor() {
@@ -14,11 +13,6 @@ export default class SummonCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX, opts?: Success | CustomError): Promise<Success | CustomError> {
-        if (!ctx.permissions.has("EMBED_LINKS")) {
-            await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-            return new CustomError(FLAG.NO_EMBED_PERMISSION);
-        }
-
         const res = await this.testConditions(ctx, opts);
         if (res.isError) return res;
 
@@ -66,10 +60,10 @@ export default class SummonCommand extends BaseCommand {
                 break;
         }
 
-        player?.setEQ(...ctx.guildSettings.music.eq.bands.map((gain, band) => ({ band, gain })));
+        player.setFilters(ctx.guildSettings.music.filters);
 
         //connect to the channel
-        player?.connect();
+        player.connect();
 
         if (!opts) {
             const joinedEmbed = new this.utils.discord.MessageEmbed()

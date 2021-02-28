@@ -13,10 +13,6 @@ export default class LoopCommand extends BaseCommand {
     }
 
     async run(ctx: CommandCTX) {
-        if (!ctx.permissions.has("EMBED_LINKS")) return await ctx.channel.send("I don't have permissions to send message embeds in this channel");
-
-        let player = this.globalCTX.lavalinkClient.players.get(ctx.guild.id);
-
         const res = MusicUtil.canModifyPlayer({
             guild: ctx.guild,
             member: ctx.member,
@@ -27,8 +23,6 @@ export default class LoopCommand extends BaseCommand {
             allowViewOnly: !ctx.args.length
         });
         if (res.isError) return;
-
-        if (!player) player = res.player;
 
         let loop = res.player?.loopState || ctx.guildSettings.music.loop;
 
@@ -55,7 +49,7 @@ export default class LoopCommand extends BaseCommand {
                     break;
             }
 
-            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the loop to ${loop}.`);
+            const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Set the loop to ${loop.toLowerCase()}.`);
             await ctx.channel.send(embedified);
             if (res.player?.textChannel && ctx.channel.id !== res.player.textChannel.id) await res.player.textChannel.send(embedified);
         }
