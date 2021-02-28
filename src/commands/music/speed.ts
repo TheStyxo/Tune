@@ -19,7 +19,7 @@ export default class SpeedCommand extends BaseCommand {
         if (!currentTimescale.speed) currentTimescale.speed = 1;
 
         if (!ctx.args.length) {
-            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current player speed is set to ${currentTimescale.speed * 100}%`));
+            return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `The current player speed is set to ${(currentTimescale.speed * 100).toFixed(2)}%`));
         }
 
         const res = MusicUtil.canModifyPlayer({
