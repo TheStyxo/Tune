@@ -673,6 +673,8 @@ export interface UnresolvedTrack extends Partial<Track> {
   duration?: number;
   /** Unique id for each track */
   uuid: string;
+  /** uri of track origin */
+  uri: string;
   /** The user that requested the track. */
   requester?: GuildMember;
   /** Resolves into a Track. */
