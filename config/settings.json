@@ -4,7 +4,7 @@
     },
     "default_activity_status": {
         "type": 2,
-        "text": "t!help",
+        "text": "t-help",
         "updateInterval": 10000
     },
     "default_invite_permissions": 536346111,
