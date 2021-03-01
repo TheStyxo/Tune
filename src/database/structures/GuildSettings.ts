@@ -182,7 +182,7 @@ export class GuildMusicSettings {
             await this.GuildSettings._DB.collections.guildSettings.updateOne({ _id: this.GuildSettings.id }, { $unset: { "settings.music.filters.rotation": null } }, { upsert: true });
         }
         else {
-            if (rotationHz > 0) throw new RangeError("The rotationHz must be grater than 0");
+            if (rotationHz < 0) throw new RangeError("The rotationHz must be grater than 0");
             this.GuildSettings._data.settings.music.filters.rotation = {
                 "rotationHz": rotationHz || 0
             };
