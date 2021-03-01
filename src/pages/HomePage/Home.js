@@ -1,6 +1,6 @@
 import React from 'react';
 import { objOne, objTwo, objThree } from './Data';
-import { MainSection, FeaturesSection, Pricing } from '../../components';
+import { MainSection, FeaturesSection } from '../../components';
 
 function Home() {
   return (

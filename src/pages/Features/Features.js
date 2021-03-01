@@ -1,6 +1,6 @@
 import React from 'react';
-import { objOne, objTwo, objThree } from './Data';
-import { MainSection, FeaturesSection, Pricing } from '../../components';
+import { objTwo, objThree } from './Data';
+import { FeaturesSection } from '../../components';
 
 function Features() {
   return (
