@@ -1,6 +1,8 @@
 import BaseEvent from '../../utils/structures/BaseEvent';
 import { Client } from 'discord.js';
 import { Utils } from '../../utils/Utils';
+import { Api } from '@top-gg/sdk';
+const topgg = new Api(Utils.credentials.topgg.token);
 
 export default class ReadyEvent extends BaseEvent {
     constructor() {
@@ -25,6 +27,19 @@ export default class ReadyEvent extends BaseEvent {
         }
         presenceUpdater.run();
 
+        //Upload stats to Top.gg
+        postStats(client);
+        setInterval(() => postStats(client), 1800000) // post every 30 minutes
+
         this.globalCTX.logger?.info("Client ready!");
     }
+}
+
+//Upload stats to Top.gg
+async function postStats(client: Client) {
+    topgg.postStats({
+        serverCount: client.guilds.cache.size,
+        shardId: client.shard?.ids[0], // if you're sharding
+        shardCount: client.options.shardCount
+    });
 }
