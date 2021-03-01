@@ -4,7 +4,7 @@ export const InfoSec = styled.div`
   color: #fff;
   padding-top: 200px;
   padding-bottom: 300px;
-  background: ${({ lightBg }) => (lightBg ? '#fff' : '#101522')};
+  background: ${({ lightBg }) => (lightBg ? '#fff' : '#151515')};
   
   @media screen and (max-width: 768px) {
     padding-top: 0px;
