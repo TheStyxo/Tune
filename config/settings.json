@@ -14,8 +14,8 @@
         "premiumURL": "https://discord.gg/XgwdeEv",
         "supportServerURL": "https://discord.gg/XgwdeEv",
         "version": "0.9.0",
-        "library": "ririchiyo.js#build",
-        "hosting": "@localhost/ririchiyo-dev-deps",
+        "library": "discord.js@v12",
+        "hosting": "@localhost/ririchiyo-svhost",
         "externalSites": {
             "top.gg": "https://top.gg/bot/696661803182194698"
         }

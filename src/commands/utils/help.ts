@@ -26,7 +26,7 @@ export default class HelpCommand extends BaseCommand {
         if (!guildSettingsData) return;
 
         if (!ctx.args[0]) {
-            helpEmbed.setAuthor(`${ctx.client.user?.username || "Tune"}`, ctx.client.user?.avatarURL() || "https://cdn.discordapp.com/embed/avatars/4.png", this.utils.settings.info.websiteURL)
+            helpEmbed.setAuthor(`${ctx.client.user?.username || "Tuney"}`, ctx.client.user?.avatarURL() || "https://cdn.discordapp.com/embed/avatars/4.png", this.utils.settings.info.websiteURL)
                 .setDescription(`A feature rich and easy to use discord music bot.\n\nMy prefix on this server is \`${guildSettingsData.prefix}\`\n\n**List of all commands-**`)
                 .setColor(this.utils.getClientColour(ctx.guild));
 

@@ -15,7 +15,7 @@ export default class InviteCommand extends BaseCommand {
         const invite = await ctx.client.generateInvite({ options: this.utils.settings.default_invite_permissions });
 
         const inviteEmbed = new this.utils.discord.MessageEmbed({
-            description: `**Add me to your server- [Invite](${invite})**\n**Join our support server- [Tune Support](${this.utils.settings.info.supportServerURL})**`,
+            description: `**Add me to your server- [Invite](${invite})**\n**Join our support server- [Tuney Support](${this.utils.settings.info.supportServerURL})**`,
             color: this.utils.getClientColour(ctx.guild)
         })
 
