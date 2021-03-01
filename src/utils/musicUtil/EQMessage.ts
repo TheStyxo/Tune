@@ -76,6 +76,7 @@ export default class EQMessage {
                 if (!permissions?.has("SEND_MESSAGES")) return;
                 if (!permissions.has("EMBED_LINKS")) return this.channel.send(Utils.embedifyString(this.channel.guild, "I don't have permissions to embed links in this channel!", true)).catch((err: Error) => GlobalCTX.logger?.error(err.message));
                 if (!permissions.has("USE_EXTERNAL_EMOJIS")) return this.channel.send(Utils.embedifyString(this.channel.guild, "I don't have permissions to use external emojis in this channel!\nThis permission is required for reaction messages to work correctly", true)).catch((err: Error) => GlobalCTX.logger?.error(err.message));
+                if (!permissions.has("READ_MESSAGE_HISTORY")) return this.channel.send(Utils.embedifyString(this.channel.guild, "I don't have permissions to read message history in this channel!\nThis permission is required for reaction messages to work correctly", true)).catch((err: Error) => GlobalCTX.logger?.error(err.message));
                 if (!permissions.has("MANAGE_MESSAGES")) return this.channel.send(Utils.embedifyString(this.channel.guild, "I don't have permissions to manage messages in this channel!\nThis permission is required for reaction controls to work correctly", true)).catch((err: Error) => GlobalCTX.logger?.error(err.message));
 
                 await reaction.users.remove(user).catch((err: Error) => GlobalCTX.logger?.error(err.message));

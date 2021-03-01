@@ -12,7 +12,7 @@ export default class EqualizerCommand extends BaseCommand {
             category: "music",
             description: "Change or view the eq settings.",
             cooldown: 30000,
-            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS", "ADD_REACTIONS", "MANAGE_MESSAGES"])
+            additionalPermsRequired: new Permissions(["USE_EXTERNAL_EMOJIS", "READ_MESSAGE_HISTORY", "ADD_REACTIONS", "MANAGE_MESSAGES"])
         })
     }
 

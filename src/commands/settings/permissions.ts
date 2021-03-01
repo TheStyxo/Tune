@@ -1,4 +1,4 @@
-import { Collection, Guild, GuildMember, Permissions, Role } from 'discord.js';
+import { Collection, Guild, GuildMember, Permissions, Role, User } from 'discord.js';
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { InternalPermissions } from '../../database/utils/InternalPermissions';
 import GuildPermission from '../../database/utils/GuildPermission';
@@ -29,32 +29,31 @@ export default class PermissionsCommand extends BaseCommand {
             }
         }
         else {
-            const parsedInput = parseInput(ctx.args.join(" "));
-
-            if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a role or user id to view permissions for!", true));
-            const found = await findRoleOrUser(ctx.guild, parsedInput.id);
-
-            const roleOrUserPermissionData = found ? ctx.guildSettings.permissions[(found as unknown as GuildMember).user ? `users` : `roles`].getFor(found.id) : null;
+            const parsedInput = await parseInput(ctx.args.join(" "), ctx.guild);
+            const roleOrUserPermissionData = parsedInput.found ? ctx.guildSettings.permissions[(parsedInput.found as unknown as GuildMember).user ? `users` : `roles`].getFor(parsedInput.found.id) : null;
 
             switch (parsedInput.option) {
                 default:
-                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
-                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Permissions for ${found}\n\n${displayPermissions(ctx.guildSettings.permissions[(found as unknown as GuildMember).user ? `users` : `roles`].getFor(found.id), found)} `));
+                    if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a role or user id to view permissions for!", true));
+                    if (!parsedInput.found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Permissions for ${parsedInput.found}\n\n${displayPermissions(ctx.guildSettings.permissions[(parsedInput.found as unknown as GuildMember).user ? `users` : `roles`].getFor(parsedInput.found.id), parsedInput.found)} `));
                 case 'allow':
                 case 'add':
                 case 'give':
                     if (!ctx.channel.permissionsFor(ctx.member)?.has("ADMINISTRATOR")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "You need to have administrator permission on this server to modify permissions!", true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
-                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a role or user id to edit permissions for!", true));
+                    if (!parsedInput.found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
                     await roleOrUserPermissionData!.allow(parsedInput.requestedPerms.bitfield);
-                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Allowed the following permissions to ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
+                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Allowed the following permissions to ${parsedInput.found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
                 case 'deny':
                 case 'remove':
                 case 'rem':
                 case 'take':
                     if (!ctx.channel.permissionsFor(ctx.member)?.has("ADMINISTRATOR")) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "You need to have administrator permission on this server to modify permissions!", true)).catch((err: Error) => this.globalCTX.logger?.error(err.message));
-                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a role or user id to edit permissions for!", true));
+                    if (!parsedInput.found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
                     await roleOrUserPermissionData!.deny(parsedInput.requestedPerms.bitfield);
-                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Denied the following permissions to ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
+                    return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Denied the following permissions to ${parsedInput.found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
                 //Add a way to reset permissions
                 case 'reset':
                 case 'res':
@@ -79,15 +78,15 @@ export default class PermissionsCommand extends BaseCommand {
                     }
 
                     if (!parsedInput.id) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Please provide a user or role id to reset the permissions for!", true));
-                    if (!found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
+                    if (!parsedInput.found) return ctx.channel.send(this.utils.embedifyString(ctx.guild, "Did not find a role or user with that id!", true));
 
                     if (parsedInput.requestedPerms.bitfield === 0) {
                         await roleOrUserPermissionData!.reset();
-                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset all permissions to default for ${found}`));
+                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset all permissions to default for ${parsedInput.found}`));
                     }
                     else {
                         await roleOrUserPermissionData!.reset(parsedInput.requestedPerms.bitfield);
-                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset the following permissions for ${found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
+                        return ctx.channel.send(this.utils.embedifyString(ctx.guild, `Reset the following permissions for ${parsedInput.found}\n•\`${parsedInput.requestedPerms.toArray().join("`\n•`")}\``));
                     }
             }
         }
@@ -100,14 +99,12 @@ function displayUsersOrRoles(rolesOrUsersCollection: Collection<string, GuildPer
     return IDsArray.length > 0 ? `•<@${isRole ? "&" : ""}${IDsArray.join(`>\n•<@${isRole ? "&" : ""}`)}>` : null;
 }
 
-function parseInput(input: string) {
+async function parseInput(input: string, guild: Guild): Promise<ParsedInput> {
     const idMatch = /(?:<@&?!?)?(?<id>\d{16,})(?:>?)/.exec(input);
     const optionMatch = /(\badd\b|\bgive\b|\ballow\b|\bremove\b|\brem\b|\btake\b|\bdeny\b|\bdelete\b|\bres\b|\breset\b|\bdefault\b)/.exec(input);
-    const forChannelMatch = /(\bc\b|\bchan\b|\bchannel\b|\bthis\b)/.exec(input);
     const forRolesOrUsersMatch = /(\br\b|\brole\b|\broles\b|\bu\b|\buser\b|\busers\b)/.exec(input);
     if (idMatch) input = input.replace(idMatch[0], "");
     if (optionMatch) input = input.replace(optionMatch[0], "");
-    if (forChannelMatch) input = input.replace(forChannelMatch[0], "");
     if (forRolesOrUsersMatch) input = input.replace(forRolesOrUsersMatch[0], "");
     const finalPermissions = new InternalPermissions();
     for (const permName of input.trim().replace(/[,]/, " ").toUpperCase().split(/\s+/).filter(v => v !== "" && v !== " "))
@@ -116,12 +113,28 @@ function parseInput(input: string) {
             break;
         } else if (managablePermissions.includes(permName)) finalPermissions.add(permName);
 
-    return { id: idMatch ? idMatch[1] : null, option: optionMatch ? optionMatch[1] : null, forChannel: !!forChannelMatch, forRolesOrUsers: forRolesOrUsersMatch ? forRolesOrUsersMatch[1].toLowerCase() : "all", requestedPerms: finalPermissions };
+    const objToReturn: ParsedInput = {
+        id: (idMatch ?? [])[1],
+        option: ((optionMatch ?? [])[1]) as unknown as ParsedInput["option"],
+        forRolesOrUsers: ((forRolesOrUsersMatch ?? [])[1]?.toLowerCase() || "all") as unknown as ParsedInput["forRolesOrUsers"],
+        requestedPerms: finalPermissions
+    };
+    objToReturn.found = objToReturn.id ? await findRoleOrUser(guild, objToReturn.id) : null;
+
+    return objToReturn;
+}
+
+export interface ParsedInput {
+    id?: string,
+    found?: GuildMember | Role | null,
+    option?: "add" | "give" | "allow" | "remove" | "rem" | "take" | "deny" | "delete" | "res" | "reset" | "default"
+    forRolesOrUsers: "roles" | "role" | "r" | "users" | "user" | "u" | "all"
+    requestedPerms: InternalPermissions,
 }
 
 async function findRoleOrUser(guild: Guild, id: string) {
     if (!id) return;
-    return guild.member(id) || await guild.roles.fetch(id);
+    return await guild.members.fetch(id) || await guild.roles.fetch(id);
 }
 
 function displayPermissions(permissions: GuildPermission, memberOrRole: GuildMember | Role) {

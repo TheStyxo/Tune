@@ -40,7 +40,7 @@ export default class SummonCommand extends BaseCommand {
             guild: ctx.guild,
             voiceChannel: res.authorVoiceChannel!,
             textChannel: ctx.channel,
-            inactivityTimeout: 120000,
+            inactivityTimeout: 300000,
             guildData: ctx.guildData,
             guildSettings: ctx.guildSettings,
             selfDeafen: true,

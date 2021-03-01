@@ -1,3 +1,3 @@
 echo off
 cls
-npm run-script build
+npm run-script install:dev && npm run-script build
