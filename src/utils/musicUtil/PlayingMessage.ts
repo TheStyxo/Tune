@@ -22,7 +22,7 @@ export default class PlayingMessage {
         if (this.message) return this.message;
 
         const playingEmbed = new Util.discord.MessageEmbed({
-            title: `${await Util.getEmoji("musical_notes")} Started playing! ${await Util.getEmoji("playing")}`,
+            title: `${await Util.getEmoji("musical_notes")} Started playing! ${await Util.getEmoji("animated_playing")}`,
             description: `**[${Util.discord.Util.escapeMarkdown(this.track.title)}](${this.track.uri})**\n\`Added by - \`${this.track.requester}\` \``,
             image: {
                 url: "https://cdn.discordapp.com/attachments/756541902202863740/780739509704327198/1920x1_TP.png"
