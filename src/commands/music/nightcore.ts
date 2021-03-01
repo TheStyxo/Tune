@@ -39,7 +39,7 @@ export default class NightcoreCommand extends BaseCommand {
 
         if (res.player?.filters.timescale || ctx.guildSettings.music.filters.timescale) {
             res.player?.setTimescale();
-            await ctx.guildSettings.music.setTimescale();
+            if (res.memberPerms.has("MANAGE_PLAYER")) await ctx.guildSettings.music.setTimescale();
 
             const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Disabled the nightcore mode.`);
             await ctx.channel.send(embedified);
