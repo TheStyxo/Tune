@@ -539,7 +539,7 @@ export class Player {
   setRotation({ rotationHz }: Filters["rotation"] = {}) {
     if (!rotationHz) delete this.filters.rotation;
     else {
-      if (rotationHz > 0) throw new RangeError("The rotationHz must be grater than 0");
+      if (rotationHz < 0) throw new RangeError("The rotationHz must be grater than 0");
       this.filters.rotation = {
         "rotationHz": rotationHz || 0
       };
