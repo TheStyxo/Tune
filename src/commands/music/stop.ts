@@ -6,7 +6,6 @@ export default class StopCommand extends BaseCommand {
     constructor() {
         super({
             name: "stop",
-            aliases: ["st"],
             category: "music",
             description: "Stop the player."
         })
