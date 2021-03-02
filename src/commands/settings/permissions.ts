@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember, Permissions, Role, User } from 'discord
 import { BaseCommand, CommandCTX } from '../../utils/structures/BaseCommand';
 import { InternalPermissions } from '../../database/utils/InternalPermissions';
 import GuildPermission from '../../database/utils/GuildPermission';
+import GlobalCTX from '../../utils/GlobalCTX';
 const managablePermissions = ["DJ", "SUMMON_PLAYER", "VIEW_QUEUE", "ADD_TO_QUEUE", "MANAGE_QUEUE", "MANAGE_PLAYER"];
 
 export default class PermissionsCommand extends BaseCommand {
@@ -134,7 +135,7 @@ export interface ParsedInput {
 
 async function findRoleOrUser(guild: Guild, id: string) {
     if (!id) return;
-    return await guild.members.fetch(id) || await guild.roles.fetch(id);
+    return await guild.members.fetch(id).catch((err: Error) => err.message === "Unknown User" ? null : GlobalCTX.logger?.error(err.message)) || await guild.roles.fetch(id);
 }
 
 function displayPermissions(permissions: GuildPermission, memberOrRole: GuildMember | Role) {

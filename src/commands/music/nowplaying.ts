@@ -27,7 +27,7 @@ export default class NowPlayingCommand extends BaseCommand {
         if (!res.player?.queue.current) return await ctx.channel.send(this.utils.embedifyString(ctx.guild, "There is nothing playing right now!", true));
 
         const nowPlayingEmbed = new this.utils.discord.MessageEmbed()
-            .setTitle(`${await this.utils.getEmoji("musical_notes")} Now playing! ${await this.utils.getEmoji("playing")}`)
+            .setTitle(`${await this.utils.getEmoji("musical_notes")} Now playing! ${await this.utils.getEmoji("animated_playing")}`)
             .setDescription(`**[${this.utils.discord.Util.escapeMarkdown(res.player.queue.current.title)}](${0/*res.player!.queue.current!.current.uri*/})**\n\`Added by- \`${res.player.queue.current.requester}\` \``)
             .setColor(this.utils.getClientColour(ctx.guild))
             .setFooter(getProgressBarData(res.player, res.player.queue.current as Track))
