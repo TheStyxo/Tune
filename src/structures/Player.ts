@@ -433,7 +433,6 @@ export class Player {
 
     const tracksArray = this.queue.current ? [...this.queue.previousTracks.splice(0, amount + 1), this.queue.current] : this.queue.previousTracks.splice(0, amount + 1);
     this.queue.add(tracksArray, 0);
-    console.log(this.queue.map(t => t.title).join("\n"));
     !(this.playing && this.queue.current) ? this.play() : this.skip(undefined, false);
     return this;
   }
