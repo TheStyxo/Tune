@@ -17,65 +17,29 @@ export default class PlayCommand extends BaseCommand {
 
         if (!ctx.args.length) {
             if (player && !player.playing && player.queue && player.queue.current) {
-                const res = MusicUtil.canModifyPlayer({
-                    guild: ctx.guild,
-                    member: ctx.member,
-                    textChannel: ctx.channel,
-                    requiredPermissions: ["MANAGE_PLAYER"],
-                    memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
-                });
-                if (res.isError) return;
-                player.pause(false);
-                const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Resumed the player!`);
-                await ctx.channel.send(embedified);
-                if (ctx.channel.id != player.textChannel.id) await player.textChannel.send(embedified);
-                return;
+                return this.globalCTX.commands.get('resume')!.run(ctx);
             }
             else if (player && player.playing && !player.paused) {
-                const res = MusicUtil.canModifyPlayer({
-                    guild: ctx.guild,
-                    member: ctx.member,
-                    textChannel: ctx.channel,
-                    requiredPermissions: ["MANAGE_PLAYER"],
-                    memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
-                });
-                if (res.isError) return;
-                player.pause(true);
-                const embedified = this.utils.embedifyString(ctx.guild, `${ctx.member} Paused the player!`);
-                await ctx.channel.send(embedified);
-                if (ctx.channel.id != player.textChannel.id) await player.textChannel.send(embedified);
-                return;
+                return this.globalCTX.commands.get('pause')!.run(ctx);
             }
             else return await ctx.channel.send(this.utils.embedifyString(ctx.guild, `${ctx.member} Please provide a song title or link to search for!`, true));
         }
 
-        let res: Success | CustomError | null = null;
 
-        if (!player || !ctx.guild.me?.voice) {
-            res = MusicUtil.canModifyPlayer({
-                guild: ctx.guild,
-                member: ctx.member,
-                textChannel: ctx.channel,
-                noPlayerRequired: true,
-                isSpawnAttempt: true,
-                requiredPermissions: ["SUMMON_PLAYER", "ADD_TO_QUEUE"],
-                memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
-            });
-            if (res.isError) return;
-        }
-        else {
-            res = MusicUtil.canModifyPlayer({
-                guild: ctx.guild,
-                member: ctx.member,
-                textChannel: ctx.channel,
-                requiredPermissions: ["ADD_TO_QUEUE"],
-                memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
-            });
-            if (res.isError) return;
-        }
+        const noPlayerExists = !player || !ctx.guild.me?.voice;
+        let res = MusicUtil.canModifyPlayer({
+            guild: ctx.guild,
+            member: ctx.member,
+            textChannel: ctx.channel,
+            noPlayerRequired: noPlayerExists,
+            isSpawnAttempt: noPlayerExists,
+            requiredPermissions: noPlayerExists ? ["SUMMON_PLAYER", "ADD_TO_QUEUE"] : ["ADD_TO_QUEUE"],
+            memberPermissions: ctx.guildSettings.permissions.users.getFor(ctx.member.id).calculatePermissions(ctx.member) || new InternalPermissions(0),
+        });
+        if (res.isError) return;
 
         //If no player summon one
-        if (!player || !ctx.guild.me?.voice) {
+        if (noPlayerExists) {
             const summonCommand = this.globalCTX.commands.get("summon")!;
             res = await summonCommand.run(ctx, res) as Success | CustomError;
             if (res.isError) return res;
