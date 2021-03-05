@@ -4,7 +4,7 @@ export const objOne = {
   lightTopLine: true,
   lightText: true,
   lightTextDesc: true,
-  headline: 'The best open-source Discord Music Bot.',
+  headline: 'Rich quality tunes for everyone.',
   description:
     'Tune is a feature-rich Discord Music Bot with many cool features like liked playlists, bassboost, eq and much more.',
   buttonLabel: 'Invite',

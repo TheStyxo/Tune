@@ -57,24 +57,6 @@ function Navbar() {
                   Features
                 </NavLinks>
               </NavItem>
-              <NavItem>
-                <NavLinks to='/products' onClick={closeMobileMenu}>
-                  Products
-                </NavLinks>
-              </NavItem>
-              <NavItemBtn>
-                {button ? (
-                  <NavBtnLink to='/sign-up'>
-                    <Button primary>SIGN UP</Button>
-                  </NavBtnLink>
-                ) : (
-                    <NavBtnLink to='/sign-up'>
-                      <Button onClick={closeMobileMenu} fontBig primary>
-                        SIGN UP
-                    </Button>
-                    </NavBtnLink>
-                  )}
-              </NavItemBtn>
             </NavMenu>
           </NavbarContainer>
         </Nav>
