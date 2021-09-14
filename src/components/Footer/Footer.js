@@ -24,7 +24,7 @@ function Footer() {
       <FooterLinksContainer>
         <FooterLinksWrapper>
           <FooterLinkItems>
-            <FooterLink to='/sign-up'>TUNE FAQ</FooterLink>
+            <FooterLink to='/'>TUNE FAQ</FooterLink>
             <FooterLink to='/'>Troubleshooting Guide</FooterLink>
             <FooterLink to='/'>Privacy Policy</FooterLink>
             <FooterLink to='/'>Support server</FooterLink>
