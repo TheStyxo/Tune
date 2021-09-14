@@ -46,7 +46,7 @@ function Footer() {
         </SocialIcons>
         <WebsiteRights>TUNEBOT © 2021</WebsiteRights>
         <WebsiteRights>
-          <FaCode style={{ paddingTop: 4 + 'px' }} /> with <FaHeart style={{ paddingTop: 4 + 'px' }} /> by <FooterLink to='\styxo.codes' target='_blank' style={{ color: 'cyan' }}>Styxo#3651</FooterLink>
+          <FaCode style={{ paddingTop: 4 + 'px' }} /> with <FaHeart style={{ paddingTop: 4 + 'px' }} /> by <FooterLink to='\styxo.codes' target='_blank' style={{ color: 'cyan' }}>Styxo#2080</FooterLink>
         </WebsiteRights>
       </SocialMediaWrap>
     </FooterContainer >
